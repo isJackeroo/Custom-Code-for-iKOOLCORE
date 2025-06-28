@@ -1,0 +1,334 @@
+{% comment %}
+  This section displays a grid of solutions or features.
+  It allows for multiple rows of 3 items each.
+{% endcomment %}
+
+<style>
+  /* Basic styling for the section - you'll want to refine this */
+  .our-solutions-section {
+    padding: 60px 20px; /* Adjust padding as needed */
+    background-color: var(--color-background, #F8F8F8); /* Use theme variables if available */
+    color: var(--color-text, #333);
+  }
+
+  .our-solutions-wrapper {
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  /* Section Widths */
+  .our-solutions-wrapper--theme-width {
+    max-width: var(--page-width, 1200px); /* Inherit theme's page width */
+  }
+
+  .our-solutions-wrapper--width-75 {
+    max-width: 75%;
+  }
+
+  .our-solutions-wrapper--width-80 {
+    max-width: 80%;
+  }
+
+  .our-solutions-wrapper--width-100 {
+    max-width: 100%;
+    padding: 0; /* Remove padding for full width content */
+  }
+
+  .our-solutions-header {
+    margin-bottom: 50px;
+  }
+
+  .our-solutions-header h2 {
+    font-size: 38px; /* Adjust font size */
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #000; /* Example color */
+  }
+
+  .our-solutions-header p {
+    font-size: 20px;
+    color: #555;
+  }
+
+  .solutions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive grid */
+    gap: 30px; /* Space between items */
+  }
+
+  .solution-item {
+    background-color: var(--color-card-background, #FFFFFF);
+    border-radius: 8px;
+    padding: 30px;
+    text-align: left;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Pushes learn more to bottom */
+    min-height: 250px; /* Ensure consistent height, adjust as needed */
+  }
+
+  .solution-item-icon {
+    font-size: 48px; /* Icon size */
+    margin-bottom: 15px;
+    color: #007bff; /* Example icon color */
+  }
+
+  .solution-item h3 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #000;
+  }
+
+  .solution-item p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #666;
+    flex-grow: 1; /* Allows description to take up available space */
+  }
+
+  .solution-item a.learn-more {
+    display: inline-block;
+    margin-top: 20px;
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  .solution-item a.learn-more:hover {
+    text-decoration: underline;
+  }
+
+  .call-to-action-button {
+    margin-top: 60px;
+    text-align: center;
+  }
+
+  .call-to-action-button a {
+    display: inline-block;
+    padding: 15px 30px;
+    background-color: #007bff; /* Example button color */
+    color: #FFFFFF;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 18px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+
+  .call-to-action-button a:hover {
+    background-color: #0056b3;
+  }
+
+  /* Responsive adjustments for smaller screens */
+  @media (max-width: 768px) {
+    .solutions-grid {
+      grid-template-columns: 1fr; /* Stack items on small screens */
+    }
+  }
+</style>
+
+<section class="our-solutions-section">
+  <div class="our-solutions-wrapper our-solutions-wrapper--{{ section.settings.section_width }}">
+    <div class="our-solutions-header">
+      {% if section.settings.heading != blank %}
+        <h2>{{ section.settings.heading }}</h2>
+      {% endif %}
+      {% if section.settings.subheading != blank %}
+        <p>{{ section.settings.subheading }}</p>
+      {% endif %}
+    </div>
+
+    <div class="solutions-grid">
+      {% for block in section.blocks %}
+        {% if block.type == 'solution_item' %}
+          <div class="solution-item">
+            {% if block.settings.icon_class != blank %}
+              <div class="solution-item-icon">
+                <i class="{{ block.settings.icon_class }}"></i>
+              </div>
+            {% endif %}
+            {% if block.settings.title != blank %}
+              <h3>{{ block.settings.title }}</h3>
+            {% endif %}
+            {% if block.settings.description != blank %}
+              <p>{{ block.settings.description }}</p>
+            {% endif %}
+            {% if block.settings.link_text != blank and block.settings.link_url != blank %}
+              <a href="{{ block.settings.link_url }}" class="learn-more">{{ block.settings.link_text }} ></a>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    {% if section.settings.button_text != blank and section.settings.button_url != blank %}
+      <div class="call-to-action-button">
+        <a href="{{ section.settings.button_url }}">{{ section.settings.button_text }}</a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Our Solutions",
+  "tag": "section",
+  "class": "section-our-solutions",
+  "settings": [
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section Width",
+      "default": "theme-width",
+      "options": [
+        {
+          "value": "theme-width",
+          "label": "Inherit Theme Width"
+        },
+        {
+          "value": "width-75",
+          "label": "75% Client Width"
+        },
+        {
+          "value": "width-80",
+          "label": "80% Client Width"
+        },
+        {
+          "value": "width-100",
+          "label": "Full Width (100%)"
+        }
+      ],
+      "info": "Controls the maximum width of the section content."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "One Platform. Endless Solutions."
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Discover how our platform can help you achieve your goals."
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Call to Action Button Text",
+      "default": "Discover more solutions with The Protectli Vault >"
+    },
+    {
+      "type": "url",
+      "id": "button_url",
+      "label": "Call to Action Button Link"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "solution_item",
+      "name": "Solution Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon_class",
+          "label": "Icon Class (e.g., fas fa-shield-alt)",
+          "info": "Requires a CSS icon library like Font Awesome to be included in your theme."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Firewall"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Keep your network safe. The Vault supports popular open source software distributions like OPNsense and pfSense."
+        },
+        {
+          "type": "text",
+          "id": "link_text",
+          "label": "Link Text",
+          "default": "Learn More"
+        },
+        {
+          "type": "url",
+          "id": "link_url",
+          "label": "Link URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Our Solutions",
+      "blocks": [
+        {
+          "type": "solution_item",
+          "settings": {
+            "icon_class": "fas fa-firewall",
+            "title": "Firewall",
+            "description": "Keep your network safe. The Vault supports popular open source software distributions like OPNsense and pfSense.",
+            "link_text": "Learn More",
+            "link_url": "#"
+          }
+        },
+        {
+          "type": "solution_item",
+          "settings": {
+            "icon_class": "fas fa-server",
+            "title": "Hypervisor",
+            "description": "The Vault allows for smooth deployment of running a hypervisor like XCP-ng, Citrix Hypervisor, ESXi, or Proxmox.",
+            "link_text": "Learn More",
+            "link_url": "#"
+          }
+        },
+        {
+          "type": "solution_item",
+          "settings": {
+            "icon_class": "fas fa-wifi",
+            "title": "Backup WAN",
+            "description": "Ensure business continuity with Protectli LTE failover: Stay connected with a if you add a cellular modem for failover.",
+            "link_text": "Learn More",
+            "link_url": "#"
+          }
+        },
+        {
+          "type": "solution_item",
+          "settings": {
+            "icon_class": "fas fa-user-secret",
+            "title": "VPN",
+            "description": "The Vault as your VPN Router: data encryption, threat prevention, and privacy for your entire network.",
+            "link_text": "Learn More",
+            "link_url": "#"
+          }
+        },
+        {
+          "type": "solution_item",
+          "settings": {
+            "icon_class": "fas fa-desktop",
+            "title": "Remote Office",
+            "description": "Employees around the globe have transitioned into the largest remote workforce the world has ever seen.",
+            "link_text": "Learn More",
+            "link_url": "#"
+          }
+        },
+        {
+          "type": "solution_item",
+          "settings": {
+            "icon_class": "fas fa-globe",
+            "title": "IOT",
+            "description": "Monitor and track your assets with Vault hardware: small footprint, reliable, and an open platform.",
+            "link_text": "Learn More",
+            "link_url": "#"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
