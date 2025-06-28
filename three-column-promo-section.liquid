@@ -1,0 +1,890 @@
+<style>
+  /*
+    General Styling Principles for Theme Inheritance:
+    - Font sizes, families, and base colors are primarily inherited from the Shopify theme's global styles.
+    - CSS Custom Properties (var(--variable-name, fallback-value)) are used extensively to pull values
+      defined by the theme (e.g., --page-width, --color-text, --font-body-weight).
+    - Specific styles are applied only where necessary for layout (Flexbox, positioning),
+    component-specific design (buttons, cards), or explicit overrides requested by the user.
+    - Helper classes (e.g., .text-align-center, .font-weight-bold) are used for dynamic styling
+      controlled via the theme editor settings.
+  */
+
+  /* Base section styling - ensures central alignment and inherited max-width */
+  .section-three-column-promo {
+    text-align: center;
+    padding: var(--spacing-section-py, 50px) 0;
+    /* Use CSS variables for consistent spacing if theme defines them */
+    /* By default, limit max-width and center content */
+    max-width: var(--page-width, 1200px);
+    margin: 0 auto;
+    position: relative;
+    /* Prepare for potential background image */
+    z-index: 1;
+    /* Ensure content is above the background image */
+  }
+
+  /* When there's a full-width background image, remove max-width limit to allow content to span full width with the background */
+  .section-three-column-promo.has-full-width-background {
+    max-width: 100vw;
+    /* Force full width */
+    width: 100%;
+    /* Ensure 100% width */
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    position: relative;
+    /* Reset relative positioning for offset calculation */
+  }
+
+  /* Container for the full-width background image, ensuring it covers the entire section row */
+  .section-three-column-promo__background-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: -1;
+    /* Place background image below content */
+  }
+
+  .section-three-column-promo__background-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Ensure image covers the entire container, cropping excess */
+    object-position: center;
+    /* Center the image within its container */
+  }
+
+
+  /* Main Heading wrapper styling */
+  .three-column-promo__heading-wrapper {
+    margin-bottom: var(--spacing-heading-mb, 40px);
+    /* Use CSS variables for consistent heading spacing */
+  }
+
+  /* Main Headings common styles for alignment and font-weight */
+  .three-column-promo__heading {
+    margin-top: 0;
+    /* Remove default top margin for headings */
+    margin-bottom: 0;
+    /* Remove default bottom margin to let wrapper control it */
+    /* Font size and family are inherited from theme's H1/H2/H3 styles */
+    color: var(--color-heading, inherit);
+    /* Inherit heading color, or use a fallback */
+  }
+
+  /* Flexbox container for columns */
+  .three-column-promo__columns {
+    display: flex;
+    justify-content: center;
+    /* Use CSS variable for consistent column gap; default from theme settings */
+    gap: var(--spacing-columns-gap, 120px);
+    flex-wrap: wrap;
+  }
+
+  /* Individual column styling */
+  .three-column-promo__column {
+    flex: 1 1 280px;
+    /* Shorthand: flex-grow, flex-shrink, flex-basis (min-width) */
+    max-width: 350px;
+    text-align: center;
+    display: flex;
+    /* Make column a flex container to push button to bottom */
+    flex-direction: column;
+    background-color: var(--color-background-card, #ffffff);
+    /* Optional: Add a subtle background for the card */
+    border-radius: var(--card-border-radius, 8px);
+    /* Rounded corners for the card */
+    box-shadow: var(--card-shadow, 0 4px 12px rgba(0, 0, 0, 0.08));
+    /* Subtle shadow for depth */
+    padding: 25px;
+    /* Padding inside the card */
+    margin-bottom: 20px;
+    /* Space below each column when wrapped */
+  }
+
+  /* Column title styling */
+  .three-column-promo__column-title {
+    margin-top: 0;
+    margin-bottom: 20px;
+    /* Space below column title and image */
+    color: var(--color-heading, inherit);
+    /* Inherit heading color from theme */
+    padding-bottom: 20px;
+    /* Space for the line */
+    position: relative;
+    /* Necessary for absolute positioning of pseudo-element */
+  }
+
+  /* Line under column title */
+  .three-column-promo__column-title::after {
+    content: '';
+    display: block;
+    width: 50%;
+    /* Short line width */
+    height: 1px;
+    /* Line thickness */
+    background-color: var(--color-border, #ddd);
+    /* Line color */
+    margin: 0 auto;
+    /* Center the line */
+    position: absolute;
+    bottom: 0;
+    /* Position at the bottom of the padding-bottom space */
+    left: 50%;
+    transform: translateX(-50%);
+    /* Center the line horizontally */
+  }
+
+  /* --- Image Styles --- */
+
+  /* Base image container for fixed dimensions and object-fit */
+  .three-column-promo__image-container {
+    padding-top: 75%;
+    /* 4:3 aspect ratio (height / width * 100%) - adjust as needed */
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 25px;
+    /* Space between image and summary/selling points */
+    /* Use CSS variable to dynamically control image container width, default to 100% */
+    width: var(--image-container-width, 100%);
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 4px;
+    /* Uniform small rounded corners */
+    /* Ensure base styles have no conflicting background or border */
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
+  /* Image styling to fill container */
+  .three-column-promo__image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Ensures image covers the area without distortion */
+    object-position: center;
+    /* Centers the image within its container */
+    transition: transform 0.3s ease;
+    /* Smooth zoom on hover */
+    /* Inherit border-radius from container */
+    border-radius: inherit;
+  }
+
+  .three-column-promo__image-container:hover .three-column-promo__image {
+    transform: scale(1.05);
+    /* Slight zoom effect on hover */
+  }
+
+  /* Image style: Clean (now the only style) - no background, no border, no shadow */
+  .three-column-promo__image-style-clean .three-column-promo__image-container {
+    background-color: transparent;
+    /* Ensure no background */
+    border: none;
+    /* Ensure no border */
+    box-shadow: none;
+    /* Ensure no shadow */
+  }
+
+  /* Product summary text styling (now inheriting from section settings) */
+  .three-column-promo__summary {
+    margin-bottom: 25px;
+    /* Space below summary and selling points */
+    line-height: 1.5;
+    color: var(--color-text-secondary, inherit);
+    /* Inherit text color, or use a fallback */
+  }
+
+  /* Selling points list styling */
+  .three-column-promo__selling-points {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 0;
+    /* Important: Remove margin-bottom to let price hint/button wrapper control spacing */
+    text-align: center;
+    /* Center align selling points */
+    flex-grow: 1;
+    /* Allows selling points to take up available space, pushing content below */
+    color: var(--color-text, inherit);
+    /* Inherit text color from theme */
+  }
+
+  /* Individual selling point item styling with dashed separator */
+  .three-column-promo__selling-points li {
+    margin-bottom: 15px;
+    /* Space between items */
+    padding-bottom: 15px;
+    /* Space for the dashed line */
+    border-bottom: 1px dashed var(--color-border-dashed, #ddd);
+    /* Dashed line separator */
+    line-height: 1.4;
+  }
+
+  /* Remove border from the last selling point */
+  .three-column-promo__selling-points li:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  /* Price hint text styling (using general settings) */
+  .three-column-promo__price-hint {
+    margin-top: 25px;
+    margin-bottom: 15px;
+    line-height: 1.5;
+    color: var(--price-hint-color);
+    /* Dynamic color from inline style var */
+    font-weight: var(--price-hint-font-weight);
+    /* Dynamic font weight from inline style var */
+    font-style: var(--price-hint-font-style);
+    /* Dynamic font style from inline style var */
+  }
+
+  /* Price hint font size based on selected option */
+  .three-column-promo__price-hint.font-size-h4 {
+    font-size: var(--font-size-h4, 1.5em);
+  }
+
+  .three-column-promo__price-hint.font-size-h5 {
+    font-size: var(--font-size-h5, 1.25em);
+  }
+
+  .three-column-promo__price-hint.font-size-h6 {
+    font-size: var(--font-size-h6, 1em);
+  }
+
+  .three-column-promo__price-hint.font-size-small {
+    font-size: 0.9em;
+  }
+
+  .three-column-promo__price-hint.font-size-medium {
+    font-size: 1em;
+  }
+
+  .three-column-promo__price-hint.font-size-large {
+    font-size: 1.1em;
+  }
+
+
+  /* Buy Now button wrapper and button styling */
+  .three-column-promo__button-wrapper {
+    margin-top: auto;
+    /* Push button (and price hint) to the bottom */
+    padding-top: 0;
+    /* Remove redundant padding */
+    display: flex;
+    flex-direction: column;
+    /* Make this a column flex container so price hint and button stack */
+    align-items: center;
+    /* Center items within this wrapper */
+  }
+
+  .three-column-promo__button {
+    display: inline-block;
+    padding: 8px 18px;
+    background-color: transparent;
+    /* No button background */
+    color: var(--button-text-color);
+    /* Dynamic black text */
+    text-decoration: none;
+    border: 1px solid var(--button-border-color);
+    /* Dynamic black button border */
+    border-radius: var(--button-border-radius);
+    /* Dynamic button rounded corners */
+    font-weight: var(--button-font-weight);
+    /* Dynamic font weight */
+    font-style: var(--button-font-style);
+    /* Dynamic font style */
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, border-radius 0.3s ease;
+    /* Smooth transitions, add border-radius to transition */
+    box-shadow: none;
+    /* Remove default shadow */
+    cursor: pointer;
+  }
+
+  /* Button font size based on selected option */
+  .three-column-promo__button.font-size-small {
+    font-size: 0.9em;
+  }
+
+  .three-column-promo__button.font-size-medium {
+    font-size: 1em;
+  }
+
+  .three-column-promo__button.font-size-large {
+    font-size: 1.1em;
+  }
+
+
+  .three-column-promo__button:hover {
+    background-color: #0E1B4D;
+    /* On hover, background color changes to #0E1B4D */
+    color: #EFF0F5;
+    /* Font color changes to #EFF0F5 */
+    border-color: #0E1B4D;
+    /* Ensure border color matches background on hover */
+    /* Remove border-radius: 0; to maintain user-selected rounded corners */
+    transform: none;
+    /* Remove lift effect if desired, or keep a subtle one */
+    box-shadow: none;
+    /* Remove any hover shadow */
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .three-column-promo__columns {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .three-column-promo__column {
+      max-width: 90%;
+      /* Allow columns to be wider on smaller screens when stacked */
+      width: 100%;
+      padding: 20px;
+      /* Adjust padding for smaller screens */
+    }
+
+    .three-column-promo__image-container {
+      padding-top: 66.66%;
+      /* Adjust aspect ratio for mobile if needed (e.g., 3:2) */
+    }
+  }
+
+  /* Helper classes for text alignment and font weight/size (can be removed if theme provides similar) */
+  .text-align-left {
+    text-align: left;
+  }
+
+  .text-align-center {
+    text-align: center;
+  }
+
+  .text-align-right {
+    text-align: right;
+  }
+
+  /* Font weight helper classes */
+  .font-weight-light {
+    font-weight: 300;
+  }
+
+  .font-weight-normal {
+    font-weight: 400;
+  }
+
+  .font-weight-bold {
+    font-weight: 700;
+  }
+
+  /* Font style helper class */
+  .font-style-italic {
+    font-style: italic;
+  }
+
+  /* Generic font size helper classes for price hint and button */
+  .font-size-small {
+    font-size: 0.9em;
+  }
+
+  .font-size-medium {
+    font-size: 1em;
+  }
+
+  .font-size-large {
+    font-size: 1.1em;
+  }
+</style>
+
+<div
+  class="section-three-column-promo {% if section.settings.background_style == 'full_width_image' and section.settings.background_image != blank %}has-full-width-background{% endif %}"
+>
+  {% if section.settings.background_style == 'full_width_image' and section.settings.background_image != blank %}
+    <div class="section-three-column-promo__background-wrapper">
+      <img
+        src="{{ section.settings.background_image | image_url: width: 2000 }}"
+        alt="{{ section.settings.background_image.alt | escape }}"
+        class="section-three-column-promo__background-image"
+        loading="lazy"
+      >
+    </div>
+  {% endif %}
+
+  <div class="three-column-promo__heading-wrapper">
+    {% assign main_heading_tag = section.settings.main_heading_tag %}
+    {% if section.settings.main_heading_text != blank %}
+    <{{ main_heading_tag }}
+      class="three-column-promo__heading {{ section.settings.heading_alignment }} {% if section.settings.heading_bold %}font-weight-bold{% else %}font-weight-normal{% endif %}"
+      >
+      {{ section.settings.main_heading_text }}
+      </{{ main_heading_tag }}>
+    {% endif %}
+  </div>
+
+  <div class="three-column-promo__columns" style="--spacing-columns-gap: {{ section.settings.columns_gap }}px;">
+    {% for block in section.blocks %}
+    <div class="three-column-promo__column">
+      {% assign column_title_tag = section.settings.column_title_tag %}
+      {% if block.settings.collection_title != blank %}
+      <{{ column_title_tag }}
+        class="three-column-promo__column-title {% if section.settings.column_title_bold %}font-weight-bold{% else %}font-weight-normal{% endif %}"
+        >
+        {{ block.settings.collection_title }}
+        </{{ column_title_tag }}>
+      {% endif %}
+
+      {% if block.settings.image != blank %}
+      {% comment %}
+        Dynamically control the image container width by setting the --image-container-width CSS variable
+      {% endcomment %}
+      <div
+        class="three-column-promo__image-container three-column-promo__image-style-clean"
+        style="--image-container-width: {{ section.settings.image_width }}%;"
+      >
+        <img
+          src="{{ block.settings.image | image_url: width: 700 }}"
+          alt="{{ block.settings.image.alt | escape }}"
+          class="three-column-promo__image"
+          loading="lazy"
+        >
+      </div>
+      {% endif %}
+
+      {% if block.settings.summary_text != blank %}
+      <p
+        class="three-column-promo__summary {{ section.settings.summary_alignment }} {{ section.settings.summary_font_size }} {% if section.settings.summary_bold %}font-weight-bold{% else %}font-weight-normal{% endif %}"
+      >
+        {{ block.settings.summary_text }}
+      </p>
+      {% endif %}
+
+      {% assign selling_points_exist = false %}
+      {% for i in (1..9) %}
+      {% capture selling_point_id %}selling_point_{{ i }}{% endcapture %}
+      {% if block.settings[selling_point_id] != blank %}
+      {% assign selling_points_exist = true %}
+      {% break %}
+      {% endif %}
+      {% endfor %}
+
+      {% if selling_points_exist %}
+      <ul class="three-column-promo__selling-points">
+        {% for i in (1..9) %}
+        {% capture selling_point_id %}selling_point_{{ i }}{% endcapture %}
+        {% if block.settings[selling_point_id] != blank %}
+        <li>{{ block.settings[selling_point_id] }}</li>
+        {% endif %}
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      {% assign show_price_hint = false %}
+      {% if block.settings.price_hint_text != blank %}
+      {% assign show_price_hint = true %}
+      {% endif %}
+
+      {% assign show_button = false %}
+      {% if block.settings.button_label != blank and block.settings.button_link != blank %}
+      {% assign show_button = true %}
+      {% endif %}
+
+      {% if show_price_hint or show_button %}
+      <div class="three-column-promo__button-wrapper">
+        {% if show_price_hint %}
+        {% assign price_hint_tag = section.settings.price_hint_tag %}
+        <{{ price_hint_tag }}
+          class="three-column-promo__price-hint text-align-center
+          font-size-{{ section.settings.price_hint_font_size }}
+          {% if section.settings.price_hint_bold %}font-weight-bold{% else %}font-weight-normal{% endif %}
+          {% if section.settings.price_hint_italic %}font-style-italic{% endif %}"
+          style="color: {{ section.settings.price_hint_color }};"
+          >
+          {{ block.settings.price_hint_text }}
+          </{{ price_hint_tag }}>
+        {% endif %}
+
+        {% if show_button %}
+        <a href="{{ block.settings.button_link }}"
+          class="three-column-promo__button
+          font-size-{{ section.settings.button_font_size }}
+          {% if section.settings.button_bold %}font-weight-bold{% else %}font-weight-normal{% endif %}
+          {% if section.settings.button_italic %}font-style-italic{% endif %}"
+          style="
+            --button-text-color: {{ section.settings.button_text_color }};
+            --button-border-color: {{ section.settings.button_border_color }};
+            --button-border-radius: {% if section.settings.button_border_radius %}10px{% else %}0px{% endif %};
+          "
+        >
+          {{ block.settings.button_label }}
+        </a>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Three Column Promo",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Main Heading Settings"
+    },
+    {
+      "type": "text",
+      "id": "main_heading_text",
+      "label": "Main Heading Content",
+      "default": "Our Core Advantages",
+      "info": "This is the main heading for the entire section."
+    },
+    {
+      "type": "select",
+      "id": "main_heading_tag",
+      "label": "Main Heading Size",
+      "options": [
+        { "value": "h1", "label": "H1 (Largest)" },
+        { "value": "h2", "label": "H2 (Medium)" },
+        { "value": "h3", "label": "H3 (Smaller)" }
+      ],
+      "default": "h2",
+      "info": "Select an HTML heading tag to display the main heading, affecting its default size."
+    },
+    {
+      "type": "checkbox",
+      "id": "heading_bold",
+      "label": "Bold Main Heading",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "Main Heading Alignment",
+      "options": [
+        { "value": "text-align-left", "label": "Left" },
+        { "value": "text-align-center", "label": "Center" },
+        { "value": "text-align-right", "label": "Right" }
+      ],
+      "default": "text-align-center"
+    },
+    {
+      "type": "header",
+      "content": "Section Background Settings"
+    },
+    {
+      "type": "select",
+      "id": "background_style",
+      "label": "Background Style",
+      "options": [
+        { "value": "no_background", "label": "No Background (Default)" },
+        { "value": "full_width_image", "label": "Full-width Background Image" }
+      ],
+      "default": "no_background",
+      "info": "Choose the background style for the section. If a full-width background image is selected, the image will span the entire screen width."
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background Image",
+      "info": "Visible only when 'Full-width Background Image' is selected as the background style."
+    },
+    {
+      "type": "header",
+      "content": "Column General Settings"
+    },
+    {
+      "type": "select",
+      "id": "columns_gap",
+      "label": "Column Gap",
+      "options": [
+        { "value": "80", "label": "80px" },
+        { "value": "120", "label": "120px" },
+        { "value": "150", "label": "150px" }
+      ],
+      "default": "120",
+      "info": "Set the spacing between columns."
+    },
+    {
+      "type": "select",
+      "id": "column_title_tag",
+      "label": "Column Title Size (General)",
+      "options": [
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "h4", "label": "H4" }
+      ],
+      "default": "h3",
+      "info": "Set the HTML tag size for all column titles."
+    },
+    {
+      "type": "checkbox",
+      "id": "column_title_bold",
+      "label": "Bold Column Title (General)",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "summary_font_size",
+      "label": "Summary Font Size (General)",
+      "options": [
+        { "value": "small", "label": "Small" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "large", "label": "Large" }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "checkbox",
+      "id": "summary_bold",
+      "label": "Bold Summary Text (General)",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "summary_alignment",
+      "label": "Summary Text Alignment (General)",
+      "options": [
+        { "value": "text-align-left", "label": "Left" },
+        { "value": "text-align-center", "label": "Center" },
+        { "value": "text-align-right", "label": "Right" }
+      ],
+      "default": "text-align-center"
+    },
+    {
+      "type": "range",
+      "id": "image_width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Image Width (% relative to column width)",
+      "default": 100,
+      "info": "Set the percentage width of all column image containers relative to their parent column width."
+    },
+    {
+      "type": "header",
+      "content": "Button Style Settings (General)"
+    },
+    {
+      "type": "select",
+      "id": "button_font_size",
+      "label": "Button Font Size",
+      "options": [
+        { "value": "small", "label": "Small" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "large", "label": "Large" }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "checkbox",
+      "id": "button_bold",
+      "label": "Bold Button Font",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "button_italic",
+      "label": "Italic Button Font",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_border_color",
+      "label": "Button Border Color",
+      "default": "#000000"
+    },
+    {
+      "type": "checkbox",
+      "id": "button_border_radius",
+      "label": "Button Rounded Corners (Check for rounded)",
+      "default": false,
+      "info": "Check for rounded corners (10px), uncheck for square corners (0px)."
+    },
+    {
+      "type": "header",
+      "content": "Price Hint Text Style Settings (General)"
+    },
+    {
+      "type": "select",
+      "id": "price_hint_font_size",
+      "label": "Font Size",
+      "options": [
+        { "value": "h4", "label": "H4 (Larger)" },
+        { "value": "h5", "label": "H5 (Medium)" },
+        { "value": "h6", "label": "H6 (Smaller)" },
+        { "value": "small", "label": "Regular Small" },
+        { "value": "medium", "label": "Regular Medium" },
+        { "value": "large", "label": "Regular Large" }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "select",
+      "id": "price_hint_tag",
+      "label": "HTML Tag",
+      "options": [
+        { "value": "h4", "label": "H4" },
+        { "value": "h5", "label": "H5" },
+        { "value": "h6", "label": "H6" },
+        { "value": "p", "label": "P (Paragraph)" }
+      ],
+      "default": "p",
+      "info": "Select a semantic HTML tag. Note that the final size may be affected by theme styles and your selected font size."
+    },
+    {
+      "type": "checkbox",
+      "id": "price_hint_bold",
+      "label": "Bold Font",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "price_hint_italic",
+      "label": "Italic Font",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "price_hint_color",
+      "label": "Font Color",
+      "default": "#4770DB"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "column",
+      "name": "Column Content",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "header",
+          "content": "This Column's Content"
+        },
+        {
+          "type": "text",
+          "id": "collection_title",
+          "label": "Column Title Text",
+          "default": "Product Collection Name",
+          "info": "The title for this column, which will use the size and weight from general settings."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "textarea",
+          "id": "summary_text",
+          "label": "Selling Point Summary Text",
+          "default": "This is the core selling point summary for this column's product, highlighting key advantages.",
+          "info": "The summary text for this column, which will use the size, weight, and alignment from general settings."
+        },
+        {
+          "type": "header",
+          "content": "Product Selling Points (Max 9)"
+        },
+        {
+          "type": "text",
+          "id": "selling_point_1",
+          "label": "Selling Point 1",
+          "default": "Selling Point 1"
+        },
+        {
+          "type": "text",
+          "id": "selling_point_2",
+          "label": "Selling Point 2",
+          "default": "Selling Point 2"
+        },
+        {
+          "type": "text",
+          "id": "selling_point_3",
+          "label": "Selling Point 3",
+          "default": "Selling Point 3"
+        },
+        {
+          "type": "text",
+          "id": "selling_point_4",
+          "label": "Selling Point 4",
+          "default": "Selling Point 4"
+        },
+        {
+          "type": "text",
+          "id": "selling_point_5",
+          "label": "Selling Point 5",
+          "default": "Selling Point 5"
+        },
+        {
+          "type": "text",
+          "id": "selling_point_6",
+          "label": "Selling Point 6",
+          "default": "Selling Point 6"
+        },
+        {
+          "type": "text",
+          "id": "selling_point_7",
+          "label": "Selling Point 7",
+          "default": "Selling Point 7"
+        },
+        {
+          "type": "text",
+          "id": "selling_point_8",
+          "label": "Selling Point 8",
+          "default": "Selling Point 8"
+        },
+        {
+          "type": "text",
+          "id": "selling_point_9",
+          "label": "Selling Point 9",
+          "default": "Selling Point 9"
+        },
+        {
+          "type": "header",
+          "content": "Buy Button Settings (This Column)"
+        },
+        {
+          "type": "text",
+          "id": "price_hint_text",
+          "label": "Price Hint Information",
+          "default": "Starts at $199",
+          "info": "Displays below selling points and above the button. Styling will use general settings."
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button Text",
+          "default": "Buy Now"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button Link",
+          "info": "Select a product collection"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Three Column Promo",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}
