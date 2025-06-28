@@ -1,0 +1,127 @@
+{% comment %}
+  This snippet contains the HTML, CSS, and JS for a coupon code block on product pages.
+  It's designed to be used as a Block type within the main-product Section.
+  Custom settings from the theme editor can be accessed via block.settings.
+{% endcomment %}
+
+<style>
+  /* Use block.id to ensure unique styling and prevent conflicts with other blocks */
+  .coupon-code-{{ block.id }} {
+    background-color: {{ block.settings.background_color }}; /* Get background color from Block settings */
+    background-position: center;
+    border-radius: 6px;
+    padding: 6px 15px;
+
+    margin-bottom: 20px; /* Bottom margin remains consistent */
+    max-width: fit-content; /* Ensure block width fits content */
+
+    /* Adjust horizontal alignment based on settings */
+    {% if block.settings.block_alignment == 'left' %}
+      margin-left: 0;
+      margin-right: auto;
+    {% elsif block.settings.block_alignment == 'right' %}
+      margin-left: auto;
+      margin-right: 0;
+    {% else %} /* Default or 'center' */
+      margin-left: auto;
+      margin-right: auto;
+    {% endif %}
+
+    font-size: {{ block.settings.font_size }}px; /* Get font size from Block settings */
+
+    /* Flexbox layout for internal text centering */
+    display: flex;
+    justify-content: center; /* Horizontal centering */
+    align-items: center; /* Vertical centering */
+    flex-wrap: nowrap; /* Core modification: Force content to stay on one line */
+    gap: 5px; /* Increase spacing between elements */
+
+    /* For single-line display: Handle overflowing text */
+    white-space: nowrap; /* Force all content within flex item to stay on one line */
+    overflow: hidden;     /* Hide content that overflows the container */
+    text-overflow: ellipsis; /* Display ellipsis for overflowing text (only effective for text content) */
+  }
+
+  /* Adjustments for the copy button, making it work better with Flexbox */
+  .coupon-code-{{ block.id }} .copy-button {
+    border: solid 1px;
+    display: inline-block;
+    border-radius: 4px;
+    padding: 2px 9px;
+    background-color: {{ block.settings.button_background_color }};
+    color: {{ block.settings.button_text_color }}; /* Get button text color from Block settings */
+    font-weight: normal;
+    cursor: pointer; /* Add pointer cursor to indicate clickability */
+    white-space: nowrap; /* Prevent button text from wrapping */
+    flex-shrink: 0; /* Prevent the button from shrinking when space is limited */
+    transition: background-color 0.3s, color 0.3s; /* Add transition effect for smoother color changes */
+  }
+
+  /* Button style after successful copy */
+  .coupon-code-{{ block.id }} .copy-button.copied {
+    color: {{ block.settings.copied_text_color }}; /* Get copied text color from Block settings */
+    /* Add more styles here, e.g., change background color to indicate copied state */
+    /* background-color: #d4edda; */ /* Example: green background */
+  }
+
+  /* Ensure coupon message and discount code sections do not wrap and apply ellipsis correctly */
+  .coupon-code-{{ block.id }} > span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  @media screen and (max-width: 768px) {
+    .coupon-code-{{ block.id }} {
+      max-width: calc(100% - 20px); /* Adjust width for small screens, leaving some margin */
+      padding: 6px 10px; /* Adjust padding for small screens */
+      /* Alignment here is controlled by the outer `product__policies` or remains default `margin: auto` for centering */
+    }
+  }
+
+  /* This class is typically provided by the theme for centering text, ensuring the entire block is centered on the page */
+  .product__policies.rte.small--text-center {
+      text-align: center; /* This will center the entire .coupon-code-{{ block.id }} container */
+  }
+</style>
+
+<div class="product__policies rte small--text-center">
+  <div class="coupon-code-{{ block.id }}">
+    <span style="color: {{ block.settings.text_color }};">
+      {{ block.settings.coupon_message }}
+    </span>
+    <span id="coupon-code-{{ block.id }}" style="color: {{ block.settings.text_color }}; font-weight: 500;">
+      {{ block.settings.discount_code }}
+    </span>
+    <span class="copy-button" id="coupon-code-button-{{ block.id }}" onclick="copyCoupon('coupon-code-{{ block.id }}', 'coupon-code-button-{{ block.id }}')">
+      Copy
+    </span>
+  </div>
+  <small style="font-size: 0.75rem;" class="discount-code"></small>
+</div>
+
+<script type="text/javascript">
+  function copyCoupon(codeElementId, buttonElementId) {
+    let discountCode = document.getElementById(codeElementId).innerText;
+    let input = document.createElement('input');
+    // Generate a unique ID for the input field to prevent conflicts if multiple copy buttons exist on the page
+    input.setAttribute('id', 'copyInput-' + codeElementId);
+    input.setAttribute('value', discountCode);
+    document.getElementsByTagName('body')[0].appendChild(input);
+    document.getElementById('copyInput-' + codeElementId).select();
+
+    if (document.execCommand('copy')) {
+      let copiedButton = document.getElementById(buttonElementId);
+      copiedButton.innerHTML = "Copied!";
+      // Add a class to apply "copied" styles
+      copiedButton.classList.add('copied');
+
+      // After successful copy, reset button text to "Copy" and remove the copied class after 2 seconds
+      setTimeout(() => {
+        copiedButton.innerHTML = "Copy";
+        copiedButton.classList.remove('copied');
+      }, 2000);
+    }
+    document.getElementById('copyInput-' + codeElementId).remove();
+  }
+</script>
