@@ -1,0 +1,561 @@
+<style>
+  /* Style for the section - adjust as needed for layout, but font properties should inherit from theme */
+  .category-selector-section {
+    padding: 50px 20px;
+    margin: 0 auto;
+    /* Dynamic max-width based on user selection */
+    {% if section.settings.page_width == 'theme' %}
+      /* Inherit theme's max width, typically set on a global wrapper */
+      max-width: var(--page-width, 1200px); /* Assuming theme uses a CSS variable for page width, adjust if needed */
+    {% elsif section.settings.page_width == '75_percent' %}
+      width: 75%;
+      max-width: 100%; /* Ensure it doesn't exceed 75% of viewport */
+    {% elsif section.settings.page_width == '80_percent' %}
+      width: 80%;
+      max-width: 100%; /* Ensure it doesn't exceed 80% of viewport */
+    {% else %} /* 100_percent */
+      width: 100%;
+      max-width: 100%; /* Full width */
+    {% endif %}
+  }
+
+  /* Text Alignment for Section Heading and Description */
+  .section-header-wrapper {
+    text-align: {{ section.settings.header_alignment }}; /* Dynamic alignment */
+    margin-bottom: 40px; /* Space below header */
+  }
+
+  /* Specific styles for the .section-heading class (layout only) */
+  /* Font properties will inherit from theme's base H1/H2/H3 styles */
+  .section-heading {
+    margin-bottom: 15px; /* Adjust spacing below the heading */
+    {% if section.settings.section_heading_bold %}
+      font-weight: bold;
+    {% else %}
+      font-weight: normal; /* Explicitly set to normal if not bold */
+    {% endif %}
+  }
+
+  /* Ensure the richtext content within the wrapper inherits correctly (layout only) */
+  /* All font properties will inherit from theme's base paragraph/body text styles */
+  .section-header-wrapper .rte {
+    max-width: 800px; /* Limit width for readability */
+    margin-left: auto; /* For center/right alignment */
+    margin-right: auto; /* For center/right alignment */
+    margin-top: 0; /* Prevent double margins if richtext outputs its own p tags with default top margins */
+    margin-bottom: 0;
+    font: inherit; /* Force all font properties to inherit from parent */
+  }
+  
+  /* Apply text-align to inner p tags if the theme doesn't inherit it well */
+  .section-header-wrapper .rte p {
+    text-align: inherit; /* Ensure inner paragraphs respect the wrapper's alignment */
+    font: inherit; /* Force all font properties to inherit from parent */
+  }
+
+  .category-selector-grid {
+    display: grid;
+    /* Dynamically set grid-template-columns based on user selection */
+    grid-template-columns: repeat({{ section.settings.columns_desktop }}, minmax(300px, 1fr));
+    /* Dynamic gap based on user selection */
+    gap: {{ section.settings.column_gap }}px;
+  }
+
+  /* Adjust grid-template-columns for tablet/mobile if different from desktop */
+  @media (max-width: 991px) { /* Adjust breakpoint as needed for tablet */
+    .category-selector-grid {
+      grid-template-columns: repeat({{ section.settings.columns_tablet }}, minmax(280px, 1fr));
+    }
+  }
+
+  @media (max-width: 768px) {
+    .category-selector-grid {
+      grid-template-columns: repeat({{ section.settings.columns_mobile }}, minmax(260px, 1fr));
+    }
+  }
+
+  .category-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 25px;
+    text-align: center;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  /* Dynamic Column Heading Styles */
+  .category-card .column-heading-class { /* This class will be applied to h2/h3/h4 based on selection */
+    margin-bottom: 15px;
+  }
+
+  /* Font properties will inherit from theme's base paragraph/body text style */
+  .category-card p.description {
+    margin-bottom: 25px;
+    flex-grow: 1; /* Allows description to take up available space */
+  }
+
+  .category-products {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  .category-products .product-item {
+    display: flex;
+    align-items: center;
+    text-align: left;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed #eee;
+    text-decoration: none; /* Remove underline from the product item link */
+  }
+
+  .category-products .product-item:last-child {
+    border-bottom: none;
+  }
+
+  .product-item-image {
+    flex-shrink: 0; /* Prevents image from shrinking */
+    margin-right: 15px;
+  }
+
+  .product-item-image img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+
+  .product-item-details {
+    flex-grow: 1;
+  }
+
+  /* Font properties will inherit from theme's base h4 style or paragraph style */
+  .product-item-details h4 {
+    margin: 0 0 5px;
+  }
+
+  /* Font properties for price will inherit from theme's base paragraph/body text style, except for specific overrides */
+  .product-item-details .price {
+    /* Keeping font-weight bold as it's common for prices. Remove if you want to strictly inherit */
+    /* font-weight: bold; */
+  }
+
+  .product-item-details .price-sale {
+    color: var(--color-price-sale, #e63232); /* Example red for sale price, use theme variable if available */
+    font-weight: bold;
+    margin-right: 8px;
+  }
+
+  .product-item-details .price-compare-at {
+    text-decoration: line-through;
+    color: var(--color-price-compare-at, #888); /* Example grey for compare-at price */
+    font-size: 0.9em; /* Slightly smaller for compare-at */
+  }
+
+  /* Dynamic Button Styles - these will be injected directly based on block settings */
+  /* The properties will be set inline for each button */
+  .category-card .view-more-button {
+    display: inline-block;
+    padding: 12px 25px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold; /* Keeping bold by default for buttons */
+    transition: background-color 0.3s ease;
+    margin-top: auto; /* Pushes button to the bottom */
+  }
+
+  /* Loop to generate dynamic CSS for each block's column heading and button */
+  {% for block in section.blocks %}
+    {% comment %} Column Heading Styles {% endcomment %}
+    {% if block.settings.column_heading_font_size != blank or block.settings.column_heading_text_color != blank or block.settings.column_heading_bold %}
+      .category-card [data-block-id="{{ block.id }}"].column-heading-class {
+        {% if block.settings.column_heading_font_size != blank %}
+          font-size: {{ block.settings.column_heading_font_size }}px;
+        {% endif %}
+        {% if block.settings.column_heading_text_color != blank %}
+          color: {{ block.settings.column_heading_text_color }};
+        {% endif %}
+        {% if block.settings.column_heading_bold %}
+          font-weight: bold;
+        {% else %}
+          font-weight: normal; /* Explicitly set to normal if not bold */
+        {% endif %}
+      }
+    {% endif %}
+
+    {% comment %} Button Styles {% endcomment %}
+    {% if block.settings.button_bg_color != blank or block.settings.button_text_color != blank or block.settings.button_font_size != blank %}
+      .category-card [data-block-id="{{ block.id }}"].view-more-button {
+        {% if block.settings.button_bg_color != blank %}
+          background-color: {{ block.settings.button_bg_color }};
+        {% endif %}
+        {% if block.settings.button_text_color != blank %}
+          color: {{ block.settings.button_text_color }};
+        {% endif %}
+        {% if block.settings.button_font_size != blank %}
+          font-size: {{ block.settings.button_font_size }}px;
+        {% endif %}
+      }
+      .category-card [data-block-id="{{ block.id }}"].view-more-button:hover {
+        {% liquid
+          assign hover_color = block.settings.button_bg_color | default: '#007bff' | color_darken: 10
+        %}
+        background-color: {{ hover_color }};
+      }
+    {% endif %}
+  {% endfor %}
+
+  .no-products-message {
+    font-style: italic; /* Keep italic if desired */
+    margin-top: 15px;
+  }
+</style>
+
+<div class="category-selector-section">
+  {% comment %} Wrapper for section header and description to apply alignment {% endcomment %}
+  <div class="section-header-wrapper">
+    {% if section.settings.section_heading != blank %}
+      {% case section.settings.heading_tag %}
+        {% when 'h1' %}
+          <h1 class="section-heading">{{ section.settings.section_heading }}</h1>
+        {% when 'h3' %}
+          <h3 class="section-heading">{{ section.settings.section_heading }}</h3>
+        {% else %}  
+          <h2 class="section-heading">{{ section.settings.section_heading }}</h2>
+      {% endcase %}
+    {% endif %}
+    {% if section.settings.section_description != blank %}
+      <div class="rte">{{ section.settings.section_description }}</div>
+    {% endif %}
+  </div>
+
+  <div class="category-selector-grid">
+    {% comment %}
+      Limit blocks rendered based on desktop column setting.
+      Ensure you have enough blocks configured in the theme customizer for the desired number of columns.
+    {% endcomment %}
+    {% for block in section.blocks limit: section.settings.columns_desktop %}
+      {% assign collection = block.settings.collection %}
+      {% if collection != blank %}
+        <div class="category-card">
+          
+          {% if block.settings.heading != blank %}
+            {% case block.settings.column_heading_tag %}
+              {% when 'h2' %}
+                <h2 class="column-heading-class" data-block-id="{{ block.id }}">{{ block.settings.heading | default: collection.title }}</h2>
+              {% when 'h4' %}
+                <h4 class="column-heading-class" data-block-id="{{ block.id }}">{{ block.settings.heading | default: collection.title }}</h4>
+              {% else %}  
+                <h3 class="column-heading-class" data-block-id="{{ block.id }}">{{ block.settings.heading | default: collection.title }}</h3>
+            {% endcase %}
+          {% else %}
+            {% case block.settings.column_heading_tag %}
+              {% when 'h2' %}
+                <h2 class="column-heading-class" data-block-id="{{ block.id }}">{{ collection.title }}</h2>
+              {% when 'h4' %}
+                <h4 class="column-heading-class" data-block-id="{{ block.id }}">{{ collection.title }}</h4>
+              {% else %}  
+                <h3 class="column-heading-class" data-block-id="{{ block.id }}">{{ collection.title }}</h3>
+            {% endcase %}
+          {% endif %}
+          
+          {% if block.settings.description != blank %}
+            <p class="description">{{ block.settings.description }}</p>
+          {% endif %}
+
+          <div class="category-products">
+            {% liquid
+              assign products_to_show = block.settings.products_limit | plus: 0
+              assign current_product_count = 0
+            %}
+            {% for product in collection.products %}
+              {% if current_product_count < products_to_show %}
+                <a href="{{ product.url }}" class="product-item">
+                  <div class="product-item-image">
+                    {% if product.featured_image %}
+                      <img
+                        src="{{ product.featured_image | image_url: width: 60 }}"
+                        alt="{{ product.featured_image.alt | default: product.title }}"
+                        loading="lazy"
+                      >
+                    {% else %}
+                      <img
+                        src="{{ 'placeholder-image.png' | asset_url }}"
+                        alt="Placeholder image"
+                        loading="lazy"
+                      >  
+                    {% endif %}
+                  </div>
+                  <div class="product-item-details">
+                    <h4>{{ product.title }}</h4>
+                    {% comment %} Price Display Logic Start {% endcomment %}
+                    {% liquid
+                      assign display_price_content = ''
+                      if product.price_varies
+                        if product.price_min > 0
+                          assign min_price_formatted = product.price_min | money
+                          assign display_price_content = 'From ' | append: min_price_formatted
+                          if product.price_max != product.price_min
+                            assign max_price_formatted = product.price_max | money
+                            assign display_price_content = display_price_content | append: ' - ' | append: max_price_formatted
+                          endif
+                        endif
+                      else
+                        if product.price > 0
+                          if product.compare_at_price > product.price
+                            assign current_price_formatted = product.price | money
+                            assign compare_price_formatted = product.compare_at_price | money
+                            assign display_price_content = '<span class="price-sale">' | append: current_price_formatted | append: '</span> <span class="price-compare-at">' | append: compare_price_formatted | append: '</span>'
+                          else
+                            assign display_price_content = product.price | money
+                          endif
+                        endif
+                      endif
+                    %}
+                    {% if display_price_content != blank %}
+                      <div class="price">{{ display_price_content | strip_newlines }}</div>
+                    {% endif %}
+                    {% comment %} Price Display Logic End {% endcomment %}
+                  </div>
+                </a>
+                {% assign current_product_count = current_product_count | plus: 1 %}
+              {% endif %}
+            {% endfor %}
+            {% if collection.products_count == 0 %}
+              <p class="no-products-message">No Products Under This Collection.</p>
+            {% endif %}
+          </div>
+
+          <a href="{{ collection.url }}" class="view-more-button" data-block-id="{{ block.id }}">
+            {{ block.settings.button_text | default: 'View More' }}
+          </a>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Product Selector",
+  "tag": "section",
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "text",
+      "id": "section_heading",
+      "label": "Section Heading",
+      "default": "Explore Our Collections"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" }
+      ],
+      "default": "h1",
+      "info": "Choose the HTML tag for the main title to inherit the theme's corresponding font styles."
+    },
+    {
+      "type": "checkbox",
+      "id": "section_heading_bold",
+      "label": "Make Section Heading Bold",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "section_description",
+      "label": "Description",
+      "default": "<p>Select the collections that best fit your needs.</p>"
+    },
+    {
+      "type": "radio",
+      "id": "header_alignment",
+      "label": "Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "label": "Desktop Columns",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "columns_tablet",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "label": "Tablet Columns",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "columns_mobile",
+      "min": 1,
+      "max": 1,
+      "step": 1,
+      "label": "Mobile Columns",
+      "default": 1
+    },
+    {
+      "type": "select",
+      "id": "column_gap",
+      "label": "Column Spacing",
+      "options": [
+        { "value": "30", "label": "30px (Default)" },
+        { "value": "80", "label": "80px" },
+        { "value": "120", "label": "120px" },
+        { "value": "150", "label": "150px" }
+      ],
+      "default": "30"
+    },
+    {
+      "type": "select",
+      "id": "page_width",
+      "label": "Page Width",
+      "options": [
+        { "value": "theme", "label": "Inherit Theme Width" },
+        { "value": "75_percent", "label": "75% Page Width" },
+        { "value": "80_percent", "label": "80% Page Width" },
+        { "value": "100_percent", "label": "100% Full Width" }
+      ],
+      "default": "theme",
+      "info": "Choose the overall width of the section. 'Inherit Theme Width' respects your theme's default page container."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category_column",
+      "name": "Category Column",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Select a Collection"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Column Heading (Optional, defaults to Collection Title)",
+          "placeholder": "e.g., Network Firewalls"
+        },
+        {
+          "type": "select",
+          "id": "column_heading_tag",
+          "label": "Column Heading Tag",
+          "options": [
+            { "value": "h2", "label": "H2" },
+            { "value": "h3", "label": "H3" },
+            { "value": "h4", "label": "H4" }
+          ],
+          "default": "h3",
+          "info": "Choose the HTML tag for the column heading to inherit the theme's corresponding font styles."
+        },
+        {
+          "type": "checkbox",
+          "id": "column_heading_bold",
+          "label": "Make Heading Bold",
+          "default": true
+        },
+        {
+          "type": "range",
+          "id": "column_heading_font_size",
+          "min": 18,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Column Heading Font Size",
+          "default": 24
+        },
+        {
+          "type": "color",
+          "id": "column_heading_text_color",
+          "label": "Column Heading Color",
+          "default": "#333333"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Column Description (Optional)",
+          "placeholder": "Describe the main features or purpose of this collection."
+        },
+        {
+          "type": "select",
+          "id": "products_limit",
+          "label": "Number of Products to Display",
+          "options": [
+            { "value": "3", "label": "3 products" },
+            { "value": "5", "label": "5 products" },
+            { "value": "7", "label": "7 products" }
+          ],
+          "default": "3"
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Button Text",
+          "default": "View More"
+        },
+        {
+          "type": "header",
+          "content": "Button Styling"
+        },
+        {
+          "type": "range",
+          "id": "button_font_size",
+          "min": 12,
+          "max": 20,
+          "step": 1,
+          "unit": "px",
+          "label": "Button Font Size",
+          "default": 15
+        },
+        {
+          "type": "color",
+          "id": "button_text_color",
+          "label": "Button Text Color",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "color",
+          "id": "button_bg_color",
+          "label": "Button Background Color",
+          "default": "#007bff"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Selector",
+      "category": "Product",
+      "blocks": [
+        {
+          "type": "category_column"
+        },
+        {
+          "type": "category_column"
+        },
+        {
+          "type": "category_column"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
