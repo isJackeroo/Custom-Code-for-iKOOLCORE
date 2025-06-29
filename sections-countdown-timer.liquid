@@ -1,0 +1,479 @@
+<style>
+  .countdown-section-wrapper {
+    background-color: {{ section.settings.section_bg_color }};
+    color: #fff;
+    padding: 8px 0; /* Further reduced padding for maximum compactness */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px; /* Reduced gap between elements */
+    overflow: hidden;
+  }
+
+  .countdown-text-container {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px; /* Even smaller gap within text container */
+  }
+
+  .countdown-text {
+    font-size: {{ section.settings.message_font_size }}px;
+    font-weight: {{ section.settings.message_font_weight }};
+    color: {{ section.settings.message_text_color }};
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .countdown-percentage-value {
+    font-size: {{ section.settings.percentage_value_font_size }}px;
+    font-weight: {{ section.settings.percentage_value_font_weight }};
+    color: {{ section.settings.percentage_value_text_color }};
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .countdown-percentage-suffix {
+    font-size: {{ section.settings.percentage_suffix_font_size }}px;
+    font-weight: {{ section.settings.percentage_suffix_font_weight }};
+    color: {{ section.settings.percentage_suffix_text_color }};
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .countdown-timer {
+    display: flex;
+    gap: 6px; /* Reduced gap in timer */
+    text-align: center;
+  }
+
+  .countdown-timer .unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.0; /* Even more compact line height */
+  }
+
+  /* Timer Value Styles */
+  .countdown-timer .value {
+    font-size: {{ section.settings.timer_value_font_size }}px;
+    font-weight: {{ section.settings.timer_value_font_weight }};
+    color: {{ section.settings.timer_value_text_color }};
+  }
+
+  /* Unified Timer Label Styles */
+  .countdown-timer .label {
+    font-size: {{ section.settings.timer_label_font_size }}px;
+    font-weight: {{ section.settings.timer_label_font_weight }};
+    color: {{ section.settings.timer_label_text_color }};
+    text-transform: uppercase;
+  }
+
+  /* Shop Now Button - Compact and Static */
+  .shop-now-button { /* Now directly styling the anchor tag */
+    display: inline-block; /* Essential for padding/sizing */
+    padding: 5px 10px; /* More compact padding for the button */
+    border: 1px solid {{ section.settings.button_border_color }};
+    background-color: {{ section.settings.button_bg_color }};
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    
+    color: {{ section.settings.button_text_color }};
+    text-decoration: none; /* Remove underline */
+    font-size: {{ section.settings.button_font_size }}px;
+    font-weight: {{ section.settings.button_font_weight }};
+    text-transform: uppercase;
+    white-space: nowrap; /* Prevent text wrapping */
+    line-height: 1; /* Ensure text takes minimal vertical space */
+  }
+
+  .shop-now-button:hover {
+    background-color: {% assign button_hover_bg_color = section.settings.button_bg_color | color_darken: 10 %}{{ button_hover_bg_color }};
+    border-color: {% assign button_hover_border_color = section.settings.button_border_color | color_darken: 10 %}{{ button_hover_border_color }};
+  }
+  
+  /* Remove old typing effect classes from responsive adjustments */
+  @media (max-width: 768px) {
+    .countdown-section-wrapper {
+      padding: 6px 0;
+      gap: 8px;
+    }
+    .countdown-text, .countdown-percentage-value, .countdown-percentage-suffix {
+      font-size: calc({{ section.settings.message_font_size }}px * 0.9);
+    }
+    .countdown-timer .value {
+      font-size: calc({{ section.settings.timer_value_font_size }}px * 0.9);
+    }
+    .countdown-timer .label {
+      font-size: calc({{ section.settings.timer_label_font_size }}px * 0.9);
+    }
+    .shop-now-button {
+      font-size: calc({{ section.settings.button_font_size }}px * 0.9);
+      padding: 4px 8px; /* Tighter padding for mobile */
+    }
+  }
+
+  @media (max-width: 480px) {
+    .countdown-section-wrapper {
+      padding: 4px 0;
+      gap: 5px;
+    }
+    .countdown-text, .countdown-percentage-value, .countdown-percentage-suffix {
+      font-size: calc({{ section.settings.message_font_size }}px * 0.8);
+    }
+    .countdown-timer {
+      gap: 3px;
+    }
+    .countdown-timer .value {
+      font-size: calc({{ section.settings.timer_value_font_size }}px * 0.8);
+    }
+    .countdown-timer .label {
+      font-size: calc({{ section.settings.timer_label_font_size }}px * 0.8);
+    }
+    .shop-now-button {
+      font-size: calc({{ section.settings.button_font_size }}px * 0.8);
+      padding: 3px 6px; /* Even tighter padding for small mobile */
+    }
+  }
+</style>
+
+<div class="countdown-section-wrapper">
+  <div class="countdown-text-container">
+    <span class="countdown-text">
+      {{ section.settings.sale_message }}
+    </span>
+    <span class="countdown-percentage-value">
+      {{ section.settings.sale_percentage_value }}%
+    </span>
+    <span class="countdown-percentage-suffix">
+      {{ section.settings.sale_percentage_suffix }}
+    </span>
+  </div>
+  <div class="countdown-timer" id="countdown-timer-{{ section.id }}">
+    <div class="unit">
+      <span class="value" id="days-{{ section.id }}">00</span>
+      <span class="label">Days</span>
+    </div>
+    <div class="unit">
+      <span class="value" id="hours-{{ section.id }}">00</span>
+      <span class="label">Hrs</span>
+    </div>
+    <div class="unit">
+      <span class="value" id="minutes-{{ section.id }}">00</span>
+      <span class="label">Mins</span>
+    </div>
+    <div class="unit">
+      <span class="value" id="seconds-{{ section.id }}">00</span>
+      <span class="label">Secs</span>
+    </div>
+  </div>
+  <a href="{{ section.settings.shop_now_link }}" class="shop-now-button"> {{ section.settings.button_text }}
+  </a>
+</div>
+
+<script>
+  (function() {
+    const sectionId = '{{ section.id }}';
+    const countdownElement = document.getElementById(`countdown-timer-${sectionId}`);
+    if (!countdownElement) return;
+
+    const daysSpan = document.getElementById(`days-${sectionId}`);
+    const hoursSpan = document.getElementById(`hours-${sectionId}`);
+    const minutesSpan = document.getElementById(`minutes-${sectionId}`);
+    const secondsSpan = document.getElementById(`seconds-${sectionId}`);
+
+    const shopNowButton = document.querySelector(`.countdown-section-wrapper .shop-now-button`); // Select the main button
+
+    // Countdown logic (remains the same)
+    const defaultEndDate = new Date();
+    defaultEndDate.setDate(defaultEndDate.getDate() + 1); // Tomorrow
+    defaultEndDate.setHours(23, 59, 59, 0);
+
+    const endDateString = "{{ section.settings.countdown_end_date }}";
+    const endDate = new Date(endDateString && !isNaN(new Date(endDateString).getTime()) ? endDateString : defaultEndDate).getTime();
+
+
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const distance = endDate - now;
+
+      if (distance < 0) {
+        clearInterval(countdownInterval);
+        countdownElement.innerHTML = "EXPIRED";
+        if (shopNowButton) {
+          shopNowButton.style.display = 'none'; // Hide the button when expired
+        }
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      daysSpan.textContent = String(days).padStart(2, '0');
+      hoursSpan.textContent = String(hours).padStart(2, '0');
+      minutesSpan.textContent = String(minutes).padStart(2, '0');
+      secondsSpan.textContent = String(seconds).padStart(2, '0');
+    }
+
+    const countdownInterval = setInterval(updateCountdown, 1000);
+    updateCountdown(); // Initial call to display immediately
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Comp. Countdown",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Colors"
+    },
+    {
+      "type": "color",
+      "id": "section_bg_color",
+      "label": "Section Background Color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Sale Message Settings"
+    },
+    {
+      "type": "text",
+      "id": "sale_message",
+      "label": "Sale Message Text",
+      "default": "Mothers day sale!"
+    },
+    {
+      "type": "range",
+      "id": "message_font_size",
+      "min": 10,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Font size",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "message_font_weight",
+      "label": "Font weight",
+      "options": [
+        { "value": "normal", "label": "Normal" },
+        { "value": "bold", "label": "Bold" }
+      ],
+      "default": "bold"
+    },
+    {
+      "type": "color",
+      "id": "message_text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Sale Percentage Value Settings"
+    },
+    {
+      "type": "text",
+      "id": "sale_percentage_value",
+      "label": "Sale Percentage (e.g., 70)",
+      "default": "70"
+    },
+    {
+      "type": "range",
+      "id": "percentage_value_font_size",
+      "min": 12,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "label": "Font size",
+      "default": 20
+    },
+    {
+      "type": "select",
+      "id": "percentage_value_font_weight",
+      "label": "Font weight",
+      "options": [
+        { "value": "normal", "label": "Normal" },
+        { "value": "bold", "label": "Bold" }
+      ],
+      "default": "bold"
+    },
+    {
+      "type": "color",
+      "id": "percentage_value_text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Sale Percentage Suffix Settings"
+    },
+    {
+      "type": "text",
+      "id": "sale_percentage_suffix",
+      "label": "Text after percentage (e.g., OFF ends in:)",
+      "default": "OFF ends in:"
+    },
+    {
+      "type": "range",
+      "id": "percentage_suffix_font_size",
+      "min": 10,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Font size",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "percentage_suffix_font_weight",
+      "label": "Font weight",
+      "options": [
+        { "value": "normal", "label": "Normal" },
+        { "value": "bold", "label": "Bold" }
+      ],
+      "default": "bold"
+    },
+    {
+      "type": "color",
+      "id": "percentage_suffix_text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Countdown Timer Settings"
+    },
+    {
+      "type": "text",
+      "id": "countdown_end_date",
+      "label": "Countdown End Date (YYYY-MM-DD HH:MM:SS)",
+      "placeholder": "e.g., 2025-07-28 23:59:59",
+      "info": "Set the date and time when the countdown ends. UseYYYY-MM-DD HH:MM:SS format. Example: 2025-07-28 23:59:59"
+    },
+    {
+      "type": "range",
+      "id": "timer_value_font_size",
+      "min": 10,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Timer Value Font size",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "timer_value_font_weight",
+      "label": "Timer Value Font weight",
+      "options": [
+        { "value": "normal", "label": "Normal" },
+        { "value": "bold", "label": "Bold" }
+      ],
+      "default": "bold"
+    },
+    {
+      "type": "color",
+      "id": "timer_value_text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Timer Labels (Days, Hrs, Mins, Secs) Settings"
+    },
+    {
+      "type": "range",
+      "id": "timer_label_font_size",
+      "min": 8,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Font size",
+      "default": 12
+    },
+    {
+      "type": "select",
+      "id": "timer_label_font_weight",
+      "label": "Font weight",
+      "options": [
+        { "value": "normal", "label": "Normal" },
+        { "value": "bold", "label": "Bold" }
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "color",
+      "id": "timer_label_text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Button Settings"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "SHOP NOW"
+    },
+    {
+      "type": "url",
+      "id": "shop_now_link",
+      "label": "Shop Now Link",
+      "default": "/collections/all"
+    },
+    {
+      "type": "range",
+      "id": "button_font_size",
+      "min": 12,
+      "max": 25,
+      "step": 1,
+      "unit": "px",
+      "label": "Button Font size",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "button_font_weight",
+      "label": "Font weight",
+      "options": [
+        { "value": "normal", "label": "Normal" },
+        { "value": "bold", "label": "Bold" }
+      ],
+      "default": "bold"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_color",
+      "label": "Button Background Color",
+      "default": "#e9419b"
+    },
+    {
+      "type": "color",
+      "id": "button_border_color",
+      "label": "Button Border Color",
+      "default": "#e9419b"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Comp. Countdown",
+      "category": "Marketing"
+    }
+  ]
+}
+{% endschema %}
