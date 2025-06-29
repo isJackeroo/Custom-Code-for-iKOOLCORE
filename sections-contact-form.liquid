@@ -13,6 +13,7 @@
   - Page width options (inherited from theme, 75%, 80%, full width).
   - Customizable text and font sizes for the image section (heading, sub-heading, button text).
   - Customizable text and font sizes for the form section (heading, sub-heading).
+  - Option to collect order number in the form.
 {% endcomment %}
 
 <div class="contact-section-wrapper"
@@ -67,6 +68,15 @@
             <input type="email" id="ContactFormEmail-{{ section.id }}" name="contact[email]" value="{% if form.email %}{{ form.email }}{% endif %}" placeholder="Email" autocorrect="off" autocapitalize="off" required style="background-color: {{ section.settings.form_input_bg_color }}; border-color: {{ section.settings.form_input_border_color }};">
           </div>
         </div>
+
+        {% if section.settings.show_order_number_field %}
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label for="ContactFormOrderNumber-{{ section.id }}">Order number (optional)</label>
+            <input type="text" id="ContactFormOrderNumber-{{ section.id }}" name="contact[Order number]" value="{% if form.order_number %}{{ form.order_number }}{% endif %}" placeholder="e.g. #1234 or GUEST123" style="background-color: {{ section.settings.form_input_bg_color }}; border-color: {{ section.settings.form_input_border_color }};">
+          </div>
+        </div>
+        {% endif %}
 
         <div class="form-row">
           <div class="form-group full-width">
@@ -180,13 +190,11 @@
 
   /* Image content font sizes are now controlled by inline styles from settings */
   .contact-image-content h2 {
-    /* font-size: 2.5rem; Removed, now set by theme editor */
     margin-bottom: 15px;
     color: #fff;
   }
 
   .contact-image-content p {
-    /* font-size: 1.1rem; Removed, now set by theme editor */
     margin-bottom: 30px;
     color: #f0f0f0;
   }
@@ -199,7 +207,6 @@
     text-decoration: none;
     font-weight: bold;
     transition: background-color 0.3s ease;
-    /* font-size is now set by theme editor */
   }
 
   .contact-email-button:hover {
@@ -214,12 +221,10 @@
 
   /* Form content font sizes are now controlled by inline styles from settings */
   .contact-form-section h2 {
-    /* font-size: 2.5rem; Removed, now set by theme editor */
     margin-bottom: 10px;
   }
 
   .contact-reply-info {
-    /* font-size: 0.95rem; Removed, now set by theme editor */
     margin-bottom: 30px;
   }
 
@@ -350,14 +355,6 @@
     .contact-image-section {
       padding: 30px 20px; /* More vertical padding for mobile, adjusted */
     }
-
-    /* Mobile specific adjustments, if needed, can override desktop settings */
-    /* For instance, if you want smaller fonts on mobile, you'd add specific font-size here */
-    /* Example:
-    .contact-image-content h2 {
-      font-size: 28px !important;
-    }
-    */
 
     .contact-form-section {
       padding: 30px 20px;
@@ -528,6 +525,13 @@
       "unit": "px",
       "label": "Sub-heading font size",
       "default": 16
+    },
+    {
+      "type": "checkbox",
+      "id": "show_order_number_field",
+      "label": "Show order number field",
+      "default": true,
+      "info": "Display an optional field for customers to enter their order number."
     },
     {
       "type": "header",
