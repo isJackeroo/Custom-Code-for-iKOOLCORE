@@ -1,0 +1,556 @@
+{% comment %}
+  Shopify Section for a Contact Page with Image and Form
+
+  This section provides a customizable two-column layout for a contact page,
+  featuring an image on the left and a contact form on the right.
+
+  Customization Options:
+  - Image selection for the left section.
+  - Background color for the entire section.
+  - Form background color for the right section.
+  - Form text color for the right section.
+  - Form input field background and border colors.
+  - Page width options (inherited from theme, 75%, 80%, full width).
+  - Customizable text and font sizes for the image section (heading, sub-heading, button text).
+  - Customizable text and font sizes for the form section (heading, sub-heading).
+{% endcomment %}
+
+<div class="contact-section-wrapper"
+  style="background-color: {{ section.settings.section_bg_color }};"
+  data-section-id="{{ section.id }}"
+  data-section-type="contact-page-with-image"
+>
+  {% assign page_width_class = 'contact-section-theme-width' %}
+  {% if section.settings.page_width == 'full_width' %}
+    {% assign page_width_class = 'contact-section-full-width' %}
+  {% elsif section.settings.page_width == 'width_75_percent' %}
+    {% assign page_width_class = 'contact-section-75-percent' %}
+  {% elsif section.settings.page_width == 'width_80_percent' %}
+    {% assign page_width_class = 'contact-section-80-percent' %}
+  {% endif %}
+
+  <div class="contact-page-inner {{ page_width_class }}">
+    <div class="contact-image-section">
+      <div class="contact-image-container"
+        {% if section.settings.image != blank %}
+          style="background-image: url('{{ section.settings.image | img_url: '1024x' }}');"
+        {% else %}
+          style="background-image: url('{{ 'placeholder-image.png' | asset_url }}'); background-color: #333;"
+        {% endif %}
+      >
+        <div class="contact-image-content">
+          <h2 style="font-size: {{ section.settings.image_heading_font_size }}px;">{{ section.settings.image_heading }}</h2>
+          <p style="font-size: {{ section.settings.image_subheading_font_size }}px;">{{ section.settings.image_subheading }}</p>
+          <a href="mailto:{{ shop.email }}" class="button contact-email-button" style="font-size: {{ section.settings.image_button_font_size }}px;">{{ section.settings.button_text }}</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-form-section" style="background-color: {{ section.settings.form_bg_color }}; color: {{ section.settings.form_text_color }};">
+      <h2 style="font-size: {{ section.settings.form_heading_font_size }}px;">{{ section.settings.form_heading }}</h2>
+      <p class="contact-reply-info" style="font-size: {{ section.settings.form_subheading_font_size }}px;">{{ section.settings.form_subheading }}</p>
+
+      {% form 'contact' %}
+        {% if form.posted_successfully? %}
+          <p class="form-success">Your message has been sent successfully!</p>
+        {% endif %}
+
+        {{ form.errors | default_errors }}
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="ContactFormName-{{ section.id }}">Name</label>
+            <input type="text" id="ContactFormName-{{ section.id }}" name="contact[name]" value="{% if form.name %}{{ form.name }}{% endif %}" placeholder="Name" style="background-color: {{ section.settings.form_input_bg_color }}; border-color: {{ section.settings.form_input_border_color }};">
+          </div>
+          <div class="form-group">
+            <label for="ContactFormEmail-{{ section.id }}">Email</label>
+            <input type="email" id="ContactFormEmail-{{ section.id }}" name="contact[email]" value="{% if form.email %}{{ form.email }}{% endif %}" placeholder="Email" autocorrect="off" autocapitalize="off" required style="background-color: {{ section.settings.form_input_bg_color }}; border-color: {{ section.settings.form_input_border_color }};">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label for="ContactFormPhone-{{ section.id }}">Phone number (optional)</label>
+            <input type="tel" id="ContactFormPhone-{{ section.id }}" name="contact[phone]" value="{% if form.phone %}{{ form.phone }}{% endif %}" placeholder="Phone number" style="background-color: {{ section.settings.form_input_bg_color }}; border-color: {{ section.settings.form_input_border_color }};">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label for="ContactFormMessage-{{ section.id }}">Comment</label>
+            <textarea rows="6" id="ContactFormMessage-{{ section.id }}" name="contact[body]" placeholder="Comment" style="background-color: {{ section.settings.form_input_bg_color }}; border-color: {{ section.settings.form_input_border_color }};">{% if form.body %}{{ form.body }}{% endif %}</textarea>
+          </div>
+        </div>
+
+        <button type="submit" class="button submit-button">Send Message</button>
+      {% endform %}
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Base Styles for the Contact Section */
+  .contact-section-wrapper {
+    padding: 0; /* Section will handle its own background */
+  }
+
+  .contact-page-inner {
+    display: flex;
+    min-height: 80vh; /* Adjust as needed */
+    flex-direction: column; /* Default to column for mobile */
+    margin: 0 auto; /* Center the content */
+    box-shadow: none; /* No shadow unless specified */
+    overflow: hidden; /* Ensure rounded corners are applied */
+  }
+
+  /* Page Width Settings */
+  .contact-section-theme-width {
+    max-width: var(--page-width); /* Inherit from theme */
+    padding: 0 var(--page-padding); /* Inherit padding */
+  }
+
+  .contact-section-75-percent {
+    max-width: 75%;
+    padding: 0 20px; /* Add some padding */
+  }
+
+  .contact-section-80-percent {
+    max-width: 80%;
+    padding: 0 20px; /* Add some padding */
+  }
+
+  .contact-section-full-width {
+    max-width: 100%;
+    padding: 0; /* No padding for full width */
+  }
+
+  /* Ensure child sections respect their own padding within full-width */
+  .contact-section-full-width .contact-image-section,
+  .contact-section-full-width .contact-form-section {
+    padding: 40px 20px; /* Default padding for image/form sections */
+  }
+  @media (min-width: 768px) {
+    .contact-section-full-width .contact-image-section,
+    .contact-section-full-width .contact-form-section {
+      padding: 60px 40px; /* Larger padding for image/form sections on desktop */
+    }
+  }
+
+  .contact-image-section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px; /* Padding around the centered container */
+    background-color: var(--color-background); /* Background of the overall image section */
+  }
+
+  .contact-image-container {
+    width: 90%; /* Adjust as needed */
+    max-width: 500px; /* Max width for the image container */
+    min-height: 300px;
+    background-size: cover;
+    background-position: center center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative; /* For overlay */
+    border-radius: 30px; /* Increased rounded corners for the container */
+    overflow: hidden; /* Ensures image and overlay are clipped by border-radius */
+  }
+
+  .contact-image-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4); /* Dark overlay to make text stand out */
+    z-index: 1;
+  }
+
+  .contact-image-content {
+    position: relative;
+    z-index: 2;
+    max-width: 400px;
+    padding: 20px; /* Padding inside the content */
+  }
+
+  /* Image content font sizes are now controlled by inline styles from settings */
+  .contact-image-content h2 {
+    /* font-size: 2.5rem; Removed, now set by theme editor */
+    margin-bottom: 15px;
+    color: #fff;
+  }
+
+  .contact-image-content p {
+    /* font-size: 1.1rem; Removed, now set by theme editor */
+    margin-bottom: 30px;
+    color: #f0f0f0;
+  }
+
+  .contact-email-button {
+    background-color: #5a577f; /* A sample purple/blue-ish color */
+    color: #fff;
+    padding: 12px 25px;
+    border-radius: var(--button-radius, 4px); /* Use theme variable if available */
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    /* font-size is now set by theme editor */
+  }
+
+  .contact-email-button:hover {
+    background-color: #6d6aa0; /* Slightly lighter on hover */
+  }
+
+  .contact-form-section {
+    flex: 1;
+    padding: 40px;
+    border-radius: 0; /* No explicit border-radius unless specified */
+  }
+
+  /* Form content font sizes are now controlled by inline styles from settings */
+  .contact-form-section h2 {
+    /* font-size: 2.5rem; Removed, now set by theme editor */
+    margin-bottom: 10px;
+  }
+
+  .contact-reply-info {
+    /* font-size: 0.95rem; Removed, now set by theme editor */
+    margin-bottom: 30px;
+  }
+
+  .contact-form-section form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Space between form rows/groups */
+  }
+
+  .form-row {
+    display: flex;
+    width: 100%;
+    gap: 20px;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  }
+
+  .form-group {
+    flex: 1;
+    min-width: 250px; /* Ensure fields don't get too small */
+    position: relative;
+  }
+
+  .form-group.full-width {
+    flex: 0 0 100%; /* Take full width */
+  }
+
+  .contact-form-section label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: normal;
+  }
+
+  .contact-form-section input[type="text"],
+  .contact-form-section input[type="email"],
+  .contact-form-section input[type="tel"],
+  .contact-form-section textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid; /* Border will now be controlled by inline style */
+    color: inherit; /* Inherit text color from form section */
+    border-radius: var(--input-border-radius, 4px); /* Use theme variable or default */
+    box-sizing: border-box;
+    font-size: 1rem; /* Keeping input font size consistent, could be made a setting too if needed */
+  }
+
+  .contact-form-section input::placeholder,
+  .contact-form-section textarea::placeholder {
+    color: #888; /* Placeholder color remains fixed for readability */
+  }
+
+  .contact-form-section input:focus,
+  .contact-form-section textarea:focus {
+    border-color: #7a77b8 !important; /* Highlight on focus, using !important for inline style override */
+    outline: none;
+  }
+
+  .contact-form-section textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .submit-button {
+    background-color: #5a577f; /* Matching the email button */
+    color: #fff;
+    padding: 15px 30px;
+    border: none;
+    border-radius: var(--button-radius, 4px);
+    cursor: pointer;
+    font-size: 1.1rem; /* Keeping submit button font size consistent, could be made a setting too if needed */
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    width: auto; /* Allow button to size naturally */
+    margin-top: 10px; /* Space above button */
+  }
+
+  .submit-button:hover {
+    background-color: #6d6aa0;
+  }
+
+  /* Form success and error messages */
+  .form-success {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    width: 100%;
+  }
+
+  .errors {
+    color: #dc3545;
+    background-color: #f8d7da;
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    width: 100%;
+  }
+
+  .errors ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .errors li {
+    margin-bottom: 5px;
+  }
+
+  /* Responsive Adjustments */
+  @media (min-width: 768px) {
+    .contact-page-inner {
+      flex-direction: row; /* Side-by-side on larger screens */
+    }
+
+    .contact-image-section {
+      flex: 1; /* Equal width columns */
+      background-color: transparent; /* Reset background for this section on desktop */
+      padding: 0; /* Remove padding here */
+    }
+
+    .contact-form-section {
+      flex: 1; /* Equal width columns */
+      padding: 60px; /* More padding on larger screens */
+    }
+  }
+
+  @media (max-width: 767px) {
+    .contact-image-section {
+      padding: 30px 20px; /* More vertical padding for mobile, adjusted */
+    }
+
+    /* Mobile specific adjustments, if needed, can override desktop settings */
+    /* For instance, if you want smaller fonts on mobile, you'd add specific font-size here */
+    /* Example:
+    .contact-image-content h2 {
+      font-size: 28px !important;
+    }
+    */
+
+    .contact-form-section {
+      padding: 30px 20px;
+    }
+
+    .form-group {
+        min-width: unset; /* Allow fields to shrink on small screens */
+    }
+
+    .form-row {
+      flex-direction: column; /* Stack fields vertically on mobile */
+      gap: 0; /* Remove gap when stacked */
+    }
+
+    .form-group {
+      margin-bottom: 15px; /* Add vertical spacing between stacked fields */
+    }
+
+    .submit-button {
+      width: 100%; /* Full width button on mobile */
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Contact Page with Image",
+  "tag": "section",
+  "class": "contact-page-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Settings"
+    },
+    {
+      "type": "color",
+      "id": "section_bg_color",
+      "label": "Section background color",
+      "default": "#1e1e3f"
+    },
+    {
+      "type": "select",
+      "id": "page_width",
+      "label": "Page Width",
+      "default": "theme_width",
+      "options": [
+        {
+          "value": "theme_width",
+          "label": "Inherit theme page width"
+        },
+        {
+          "value": "width_75_percent",
+          "label": "75% Page width"
+        },
+        {
+          "value": "width_80_percent",
+          "label": "80% Page width"
+        },
+        {
+          "value": "full_width",
+          "label": "100% Full width"
+        }
+      ],
+      "info": "Controls the maximum width of the content within this section."
+    },
+    {
+      "type": "header",
+      "content": "Left Image Section Content"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background Image",
+      "info": "Image for the left side of the section."
+    },
+    {
+      "type": "text",
+      "id": "image_heading",
+      "label": "Heading",
+      "default": "We are here to help you!"
+    },
+    {
+      "type": "range",
+      "id": "image_heading_font_size",
+      "min": 16,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Heading font size",
+      "default": 40
+    },
+    {
+      "type": "text",
+      "id": "image_subheading",
+      "label": "Sub-heading",
+      "default": "Didn't find the answer you are looking for?"
+    },
+    {
+      "type": "range",
+      "id": "image_subheading_font_size",
+      "min": 12,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Sub-heading font size",
+      "default": 18
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "Email us"
+    },
+    {
+      "type": "range",
+      "id": "image_button_font_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Button font size",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Right Form Section Content"
+    },
+    {
+      "type": "color",
+      "id": "form_bg_color",
+      "label": "Form background color",
+      "default": "#1a1a38"
+    },
+    {
+      "type": "color",
+      "id": "form_text_color",
+      "label": "Form text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "form_heading",
+      "label": "Heading",
+      "default": "Let's talk!"
+    },
+    {
+      "type": "range",
+      "id": "form_heading_font_size",
+      "min": 16,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Heading font size",
+      "default": 40
+    },
+    {
+      "type": "text",
+      "id": "form_subheading",
+      "label": "Sub-heading",
+      "default": "We'll reply quickly within 24 hours, guaranteed, every time!"
+    },
+    {
+      "type": "range",
+      "id": "form_subheading_font_size",
+      "min": 12,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Sub-heading font size",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Form Input Field Settings"
+    },
+    {
+      "type": "color",
+      "id": "form_input_bg_color",
+      "label": "Input background color",
+      "default": "#2b2b4d"
+    },
+    {
+      "type": "color",
+      "id": "form_input_border_color",
+      "label": "Input border color",
+      "default": "#444"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Contact Section with Image",
+      "category": "Contact"
+    }
+  ]
+}
+{% endschema %}
