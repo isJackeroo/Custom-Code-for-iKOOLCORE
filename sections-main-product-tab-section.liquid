@@ -65,6 +65,51 @@
     height: 18px;
     fill: currentColor;
   }
+  .user-manual-link{
+    display: inline-block;
+    padding: 10px 12px;
+    background-color: #4770DB;
+    color: #ffffff;
+    font-weight: 400;
+    border-radius: 3px;
+    text-decoration: none;
+    font-size: 16px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 18px;
+    margin-bottom: 18px;
+    margin-left: 18px;
+    
+  }
+
+  .user-manual-link:hover{
+    background-color: #007be5;
+    transform: translateY(-2px);
+    text-decoration: none;
+  }
+
+.user-download-link {
+  display: inline-block;
+  padding: 10px 12px;
+  background-color: #4770DB;
+  color: #ffffff;
+  font-weight: 400;
+  border-radius: 3px;
+  text-decoration: none;
+  font-size: 16px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  margin-top: 18px;
+  margin-bottom: 18px;
+  margin-left: 18px;
+}
+
+.user-download-link:hover {
+  background-color: #007be5;
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+  
 </style>
 
 {% assign first_active = true %}
@@ -117,20 +162,27 @@
       {% endif %}
 
       {% if product.metafields.custom.manual %}
+        {% assign manual_url = product.metafields.custom.manual | remove: '[' | remove: ']' | remove: '"' %}
         <div class="tab-content {% if tab_rendered %}active{% endif %}" id="manual">
-          <a href="{{ product.metafields.custom.manual.url.value }}" target="_blank" rel="noopener noreferrer">User Manual (PDF)</a>
+          <a href="{{ manual_url }}" target="_blank" rel="noopener" class="user-manual-link">
+            📘 View User Manual
+          </a>
         </div>
         {% assign tab_rendered = false %}
       {% endif %}
 
       {% if product.metafields.custom.download %}
+        {% assign download_url = product.metafields.custom.download | remove: '[' | remove: ']' | remove: '"' %}
         <div class="tab-content {% if tab_rendered %}active{% endif %}" id="download">
-          <a href="{{ product.metafields.custom.download.url.value }}" target="_blank" rel="noopener noreferrer">BIOS (ZIP)</a>
+          <a href="{{ download_url }}" target="_blank" rel="noopener" class="user-download-link">
+            💾 Download BIOS
+          </a>
         </div>
       {% endif %}
     </div>
   {% endif %}
 </section>
+
 
 
 <script>
