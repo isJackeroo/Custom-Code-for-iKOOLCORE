@@ -1,0 +1,38 @@
+              {% if product.metafields.custom.selling_point != blank %}
+                <div class="product-selling-points">
+                  <h2>Highlights:</h2>
+                  {{ product.metafields.custom.selling_point }}
+                </div>
+              {% endif %}
+              
+              <style>
+                .product-selling-points {
+                  margin-top: 20px;
+                  border-top: 1px solid #eee;
+                  padding-top: 20px;
+                }
+                .product-selling-points h2 {
+                  font-size: 18px;
+                  margin-bottom: 15px;
+                }
+              
+                /* 针对无序列表的优化 */
+                .product-selling-points ul {
+                  list-style: disc; /* 使用实心圆点 */
+                  padding-left: 20px; /* 整个列表左侧内边距，为列表点留出空间 */
+                  margin: 0; /* 移除默认的 ul 上下外边距 */
+                }
+              
+                .product-selling-points ul li {
+                  margin-bottom: 10px; /* 每个列表项下方留出更多空间，增强可读性 */
+                  line-height: 1.6; /* 增加行高，让长文本换行后更易读 */
+                  list-style-position: outside; /* 关键：确保列表点在内容区域的外部，这样换行文字会和第一行对齐 */
+                  padding-left: 0; /* 移除 li 默认的 padding-left，因为我们通过 ul 来控制缩进 */
+                }
+              
+                /* 如果仍有P标签，也保持一致的行高和底部间距 */
+                .product-selling-points p {
+                  margin-bottom: 10px;
+                  line-height: 1.6;
+                }
+              </style>
