@@ -1,4 +1,5 @@
 <!-- 🌟 Ride 主题产品页 Tabs 区块 -->
+
 <style>
   .custom-tabs {
     font-family: Montserrat, Poppins, sans-serif;
@@ -66,40 +67,41 @@
   }
 </style>
 
-{% assign tab_counter = 0 %}
+{% assign first_active = true %}
 <section class="section page-width" style="margin-top: 3rem;">
   {% if product.metafields.custom.spec or product.metafields.custom.reviews or product.metafields.custom.manual or product.metafields.custom.download %}
     <div class="custom-tabs">
+      <!-- Tab Buttons -->
       <ul class="tab-buttons">
         {% if product.metafields.custom.spec %}
-          {% assign tab_counter = tab_counter | plus: 1 %}
-          <li class="active" data-tab="spec">Specifications</li>
+          <li class="{% if first_active %}active{% endif %}" data-tab="spec">Specifications</li>
+          {% assign first_active = false %}
         {% endif %}
         {% if product.metafields.custom.reviews %}
-          <li {% if tab_counter == 0 %}class="active"{% endif %} data-tab="reviews">Reviews</li>
-          {% assign tab_counter = tab_counter | plus: 1 %}
+          <li class="{% if first_active %}active{% endif %}" data-tab="reviews">Reviews</li>
+          {% assign first_active = false %}
         {% endif %}
         {% if product.metafields.custom.manual %}
-          <li {% if tab_counter == 0 %}class="active"{% endif %} data-tab="manual">Manual</li>
-          {% assign tab_counter = tab_counter | plus: 1 %}
+          <li class="{% if first_active %}active{% endif %}" data-tab="manual">Manual</li>
+          {% assign first_active = false %}
         {% endif %}
         {% if product.metafields.custom.download %}
-          <li {% if tab_counter == 0 %}class="active"{% endif %} data-tab="download">Downloads</li>
+          <li class="{% if first_active %}active{% endif %}" data-tab="download">Downloads</li>
         {% endif %}
       </ul>
 
-      {% assign tab_rendered = 0 %}
-
+      <!-- Tab Content -->
+      {% assign tab_rendered = true %}
       {% if product.metafields.custom.spec %}
-        <div class="tab-content {% if tab_rendered == 0 %}active{% endif %}" id="spec">
-          {{ product.metafields.custom.spec | metafield_tag }}        
+        <div class="tab-content {% if tab_rendered %}active{% endif %}" id="spec">
+          {{ product.metafields.custom.spec | metafield_tag }}
         </div>
-        {% assign tab_rendered = tab_rendered | plus: 1 %}
+        {% assign tab_rendered = false %}
       {% endif %}
 
       {% if product.metafields.custom.reviews %}
         {% assign raw_reviews = product.metafields.custom.reviews | replace: '["', '' | replace: '"]', '' | split: '","' %}
-        <div class="tab-content {% if tab_rendered == 0 %}active{% endif %}" id="reviews">
+        <div class="tab-content {% if tab_rendered %}active{% endif %}" id="reviews">
           {% for review_url in raw_reviews %}
             {% assign video_id = review_url | split: 'v=' | last | split: '&' | first %}
             {% if video_id %}
@@ -111,56 +113,25 @@
             {% endif %}
           {% endfor %}
         </div>
-        {% assign tab_rendered = tab_rendered | plus: 1 %}
+        {% assign tab_rendered = false %}
       {% endif %}
 
-      {%- assign manual_data = product.metafields.custom.manual -%}
-      {% if manual_data %}
-        {% if manual_data contains '[' %}
-          {% assign manual_files = manual_data | parse_json %}
-        {% else %}
-          {% assign manual_files = manual_data | split: ',' %}
-        {% endif %}
-        <div class="tab-content {% if tab_rendered == 0 %}active{% endif %}" id="manual">
-          {% for file in manual_files %}
-            {% if file.url %}
-              <iframe src="{{ file.url }}#toolbar=1" width="100%" height="600px" style="border:none;margin-bottom:1rem;border-radius:6px;"></iframe>
-            {% elsif file contains 'http' %}
-              <iframe src="{{ file }}#toolbar=1" width="100%" height="600px" style="border:none;margin-bottom:1rem;border-radius:6px;"></iframe>
-            {% else %}
-              <p>⚠️ 无法识别手册文件：{{ file }}</p>
-            {% endif %}
-          {% endfor %}
+      {% if product.metafields.custom.manual %}
+        <div class="tab-content {% if tab_rendered %}active{% endif %}" id="manual">
+          <a href="{{ product.metafields.custom.manual.url.value }}" target="_blank" rel="noopener noreferrer">User Manual (PDF)</a>
         </div>
-        {% assign tab_rendered = tab_rendered | plus: 1 %}
+        {% assign tab_rendered = false %}
       {% endif %}
 
-      {%- assign download_data = product.metafields.custom.download -%}
-      {% if download_data %}
-        {% if download_data contains '[' %}
-          {% assign download_files = download_data | parse_json %}
-        {% else %}
-          {% assign download_files = download_data | split: ',' %}
-        {% endif %}
-        <div class="tab-content {% if tab_rendered == 0 %}active{% endif %}" id="download">
-          <ul style="padding-left: 1rem;">
-            {% for file in download_files %}
-              <li style="margin-bottom: 0.8rem;">
-                {% if file.url %}
-                  📎 <a href="{{ file.url }}" target="_blank" download>{{ file.filename | default: '下载文件' }}</a>
-                {% elsif file contains 'http' %}
-                  📎 <a href="{{ file }}" target="_blank" download>下载链接</a>
-                {% else %}
-                  ⚠️ 文件格式无法识别：{{ file }}
-                {% endif %}
-              </li>
-            {% endfor %}
-          </ul>
+      {% if product.metafields.custom.download %}
+        <div class="tab-content {% if tab_rendered %}active{% endif %}" id="download">
+          <a href="{{ product.metafields.custom.download.url.value }}" target="_blank" rel="noopener noreferrer">BIOS (ZIP)</a>
         </div>
       {% endif %}
     </div>
   {% endif %}
 </section>
+
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
@@ -177,6 +148,5 @@
     });
   });
 </script>
-
 
 <!-- 🌟 Ride 主题产品页 Tabs 模块代码结束 -->
