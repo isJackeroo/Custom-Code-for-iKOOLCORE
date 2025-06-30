@@ -3,12 +3,12 @@
 <style>
   .custom-tabs {
     font-family: Montserrat, Poppins, sans-serif;
-    font-size: 16px;
+    font-size: 14px;
     background-color: #EFF0F5;
     border: 1px solid #e1e1e1;
     border-radius: 8px;
     overflow: hidden;
-    max-width: 75%;
+
     margin: 0 auto;
   }
 
@@ -73,7 +73,7 @@
     font-weight: 400;
     border-radius: 3px;
     text-decoration: none;
-    font-size: 16px;
+    font-size: 14px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     transition: background-color 0.3s ease, transform 0.2s ease;
     margin-top: 18px;
@@ -96,7 +96,7 @@
   font-weight: 400;
   border-radius: 3px;
   text-decoration: none;
-  font-size: 16px;
+  font-size: 14px;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   transition: background-color 0.3s ease, transform 0.2s ease;
   margin-top: 18px;
@@ -109,8 +109,50 @@
   transform: translateY(-2px);
   text-decoration: none;
 }
+
+
+@media (max-width: 768px) {
+  .custom-tabs {
+    max-width: 100%;
+    font-size: 14px;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    width: 100%;
+    padding-left: 2px;
+    padding-right: 2px;
+
+  }
+
+  .tab-buttons li {
+    padding: 0.3rem;
+    font-size: 14px;
+    gap: 2px;
+  }
+
+  .user-manual-link,
+  .user-download-link {
+    font-size: 13px;
+    padding: 8px 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+  .tab-buttons li {
+    min-height: 48px; /* 推荐的触摸区域高度 */
+  }
+  .tab-buttons li:active {
+    background-color: #005ec2;
+  }
+  .tab-buttons {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+}
+
   
 </style>
+
 
 {% assign first_active = true %}
 <section class="section page-width" style="margin-top: 3rem;">
