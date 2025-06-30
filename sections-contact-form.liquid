@@ -53,7 +53,7 @@
 
       {% form 'contact' %}
         {% if form.posted_successfully? %}
-          <p class="form-success">Your message has been sent successfully!</p>
+          <p class="form-success" data-form-success-message>Your message has been sent successfully!</p>
         {% endif %}
 
         {{ form.errors | default_errors }}
@@ -61,11 +61,11 @@
         <div class="form-row">
           <div class="form-group">
             <label for="ContactFormName-{{ section.id }}">Name</label>
-            <input type="text" id="ContactFormName-{{ section.id }}" name="contact[name]" value="{% if form.name %}{{ form.name }}{% endif %}" placeholder="Name" style="background-color: {{ section.settings.form_input_bg_color }}; border-color: {{ section.settings.form_input_border_color }};">
+            <input type="text" id="ContactFormName-{{ section.id }}" name="contact[name]" value="{% if form.name %}{{ form.name }}{% endif %}" placeholder="" style="background-color: {{ section.settings.form_input_bg_color }}; border-color: {{ section.settings.form_input_border_color }};">
           </div>
           <div class="form-group">
             <label for="ContactFormEmail-{{ section.id }}">Email</label>
-            <input type="email" id="ContactFormEmail-{{ section.id }}" name="contact[email]" value="{% if form.email %}{{ form.email }}{% endif %}" placeholder="Email" autocorrect="off" autocapitalize="off" required style="background-color: {{ section.settings.form_input_bg_color }}; border-color: {{ section.settings.form_input_border_color }};">
+            <input type="email" id="ContactFormEmail-{{ section.id }}" name="contact[email]" value="{% if form.email %}{{ form.email }}{% endif %}" placeholder="" autocorrect="off" autocapitalize="off" required style="background-color: {{ section.settings.form_input_bg_color }}; border-color: {{ section.settings.form_input_border_color }};">
           </div>
         </div>
 
@@ -73,7 +73,7 @@
         <div class="form-row">
           <div class="form-group full-width">
             <label for="ContactFormOrderNumber-{{ section.id }}">Order number (optional)</label>
-            <input type="text" id="ContactFormOrderNumber-{{ section.id }}" name="contact[Order number]" value="{% if form.order_number %}{{ form.order_number }}{% endif %}" placeholder="e.g. #1234 or GUEST123" style="background-color: {{ section.settings.form_input_bg_color }}; border-color: {{ section.settings.form_input_border_color }};">
+            <input type="text" id="ContactFormOrderNumber-{{ section.id }}" name="contact[Order number]" value="{% if form.order_number %}{{ form.order_number }}{% endif %}" placeholder="#25068888" style="background-color: {{ section.settings.form_input_bg_color }}; border-color: {{ section.settings.form_input_border_color }};">
           </div>
         </div>
         {% endif %}
@@ -81,14 +81,14 @@
         <div class="form-row">
           <div class="form-group full-width">
             <label for="ContactFormPhone-{{ section.id }}">Phone number (optional)</label>
-            <input type="tel" id="ContactFormPhone-{{ section.id }}" name="contact[phone]" value="{% if form.phone %}{{ form.phone }}{% endif %}" placeholder="Phone number" style="background-color: {{ section.settings.form_input_bg_color }}; border-color: {{ section.settings.form_input_border_color }};">
+            <input type="tel" id="ContactFormPhone-{{ section.id }}" name="contact[phone]" value="{% if form.phone %}{{ form.phone }}{% endif %}" placeholder="" style="background-color: {{ section.settings.form_input_bg_color }}; border-color: {{ section.settings.form_input_border_color }};">
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group full-width">
-            <label for="ContactFormMessage-{{ section.id }}">Comment</label>
-            <textarea rows="6" id="ContactFormMessage-{{ section.id }}" name="contact[body]" placeholder="Comment" style="background-color: {{ section.settings.form_input_bg_color }}; border-color: {{ section.settings.form_input_border_color }};">{% if form.body %}{{ form.body }}{% endif %}</textarea>
+            <label for="ContactFormMessage-{{ section.id }}">Message</label>
+            <textarea rows="6" id="ContactFormMessage-{{ section.id }}" name="contact[body]" placeholder="" style="background-color: {{ section.settings.form_input_bg_color }}; border-color: {{ section.settings.form_input_border_color }};">{% if form.body %}{{ form.body }}{% endif %}</textarea>
           </div>
         </div>
 
@@ -101,48 +101,47 @@
 <style>
   /* Base Styles for the Contact Section */
   .contact-section-wrapper {
-    padding: 0; /* Section will handle its own background */
+    padding: 0;
   }
 
   .contact-page-inner {
     display: flex;
-    min-height: 80vh; /* Adjust as needed */
-    flex-direction: column; /* Default to column for mobile */
-    margin: 0 auto; /* Center the content */
-    box-shadow: none; /* No shadow unless specified */
-    overflow: hidden; /* Ensure rounded corners are applied */
+    min-height: 80vh;
+    flex-direction: column;
+    margin: 0 auto;
+    box-shadow: none;
+    overflow: hidden;
   }
 
   /* Page Width Settings */
   .contact-section-theme-width {
-    max-width: var(--page-width); /* Inherit from theme */
-    padding: 0 var(--page-padding); /* Inherit padding */
+    max-width: var(--page-width);
+    padding: 0 var(--page-padding);
   }
 
   .contact-section-75-percent {
     max-width: 75%;
-    padding: 0 20px; /* Add some padding */
+    padding: 0 20px;
   }
 
   .contact-section-80-percent {
     max-width: 80%;
-    padding: 0 20px; /* Add some padding */
+    padding: 0 20px;
   }
 
   .contact-section-full-width {
     max-width: 100%;
-    padding: 0; /* No padding for full width */
+    padding: 0;
   }
 
-  /* Ensure child sections respect their own padding within full-width */
   .contact-section-full-width .contact-image-section,
   .contact-section-full-width .contact-form-section {
-    padding: 40px 20px; /* Default padding for image/form sections */
+    padding: 40px 20px;
   }
   @media (min-width: 768px) {
     .contact-section-full-width .contact-image-section,
     .contact-section-full-width .contact-form-section {
-      padding: 60px 40px; /* Larger padding for image/form sections on desktop */
+      padding: 60px 40px;
     }
   }
 
@@ -151,13 +150,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px; /* Padding around the centered container */
-    background-color: var(--color-background); /* Background of the overall image section */
+    padding: 20px;
+    background-color: var(--color-background);
   }
 
   .contact-image-container {
-    width: 90%; /* Adjust as needed */
-    max-width: 500px; /* Max width for the image container */
+    width: 90%;
+    max-width: 500px;
     min-height: 300px;
     background-size: cover;
     background-position: center center;
@@ -165,9 +164,9 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    position: relative; /* For overlay */
-    border-radius: 30px; /* Increased rounded corners for the container */
-    overflow: hidden; /* Ensures image and overlay are clipped by border-radius */
+    position: relative;
+    border-radius: 30px;
+    overflow: hidden;
   }
 
   .contact-image-container::before {
@@ -177,7 +176,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.4); /* Dark overlay to make text stand out */
+    background: rgba(0, 0, 0, 0.4);
     z-index: 1;
   }
 
@@ -185,10 +184,9 @@
     position: relative;
     z-index: 2;
     max-width: 400px;
-    padding: 20px; /* Padding inside the content */
+    padding: 20px;
   }
 
-  /* Image content font sizes are now controlled by inline styles from settings */
   .contact-image-content h2 {
     margin-bottom: 15px;
     color: #fff;
@@ -200,26 +198,25 @@
   }
 
   .contact-email-button {
-    background-color: #5a577f; /* A sample purple/blue-ish color */
+    background-color: #5a577f;
     color: #fff;
     padding: 12px 25px;
-    border-radius: var(--button-radius, 4px); /* Use theme variable if available */
+    border-radius: var(--button-radius, 4px);
     text-decoration: none;
     font-weight: bold;
     transition: background-color 0.3s ease;
   }
 
   .contact-email-button:hover {
-    background-color: #6d6aa0; /* Slightly lighter on hover */
+    background-color: #6d6aa0;
   }
 
   .contact-form-section {
     flex: 1;
     padding: 40px;
-    border-radius: 0; /* No explicit border-radius unless specified */
+    border-radius: 0;
   }
 
-  /* Form content font sizes are now controlled by inline styles from settings */
   .contact-form-section h2 {
     margin-bottom: 10px;
   }
@@ -231,30 +228,31 @@
   .contact-form-section form {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px; /* Space between form rows/groups */
+    gap: 20px;
   }
 
   .form-row {
     display: flex;
     width: 100%;
     gap: 20px;
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    flex-wrap: wrap;
   }
 
   .form-group {
     flex: 1;
-    min-width: 250px; /* Ensure fields don't get too small */
+    min-width: 250px;
     position: relative;
   }
 
   .form-group.full-width {
-    flex: 0 0 100%; /* Take full width */
+    flex: 0 0 100%;
   }
 
   .contact-form-section label {
     display: block;
     margin-bottom: 8px;
     font-weight: normal;
+
   }
 
   .contact-form-section input[type="text"],
@@ -263,41 +261,44 @@
   .contact-form-section textarea {
     width: 100%;
     padding: 12px 15px;
-    border: 1px solid; /* Border will now be controlled by inline style */
-    color: inherit; /* Inherit text color from form section */
-    border-radius: var(--input-border-radius, 4px); /* Use theme variable or default */
+    border: 1px solid;
+    color: inherit;
+    border-radius: var(--input-border-radius, 4px);
     box-sizing: border-box;
-    font-size: 1rem; /* Keeping input font size consistent, could be made a setting too if needed */
+    font-size: 1rem;
   }
 
   .contact-form-section input::placeholder,
   .contact-form-section textarea::placeholder {
-    color: #888; /* Placeholder color remains fixed for readability */
+    color: #888;
+    font-size:15px;
   }
 
   .contact-form-section input:focus,
   .contact-form-section textarea:focus {
-    border-color: #7a77b8 !important; /* Highlight on focus, using !important for inline style override */
+    border-color: #7a77b8 !important;
     outline: none;
+    font-size:15px;
   }
 
   .contact-form-section textarea {
     resize: vertical;
     min-height: 120px;
+    font-size:15px;
   }
 
   .submit-button {
-    background-color: #5a577f; /* Matching the email button */
+    background-color: #5a577f;
     color: #fff;
     padding: 15px 30px;
     border: none;
     border-radius: var(--button-radius, 4px);
     cursor: pointer;
-    font-size: 1.1rem; /* Keeping submit button font size consistent, could be made a setting too if needed */
+    font-size: 1.5rem;
     font-weight: bold;
     transition: background-color 0.3s ease;
-    width: auto; /* Allow button to size naturally */
-    margin-top: 10px; /* Space above button */
+    width: auto;
+    margin-top: 10px;
   }
 
   .submit-button:hover {
@@ -312,6 +313,9 @@
     border-radius: 4px;
     margin-bottom: 20px;
     width: 100%;
+    /* Added for smooth fade-out */
+    opacity: 1;
+    transition: opacity 0.5s ease-out;
   }
 
   .errors {
@@ -336,24 +340,24 @@
   /* Responsive Adjustments */
   @media (min-width: 768px) {
     .contact-page-inner {
-      flex-direction: row; /* Side-by-side on larger screens */
+      flex-direction: row;
     }
 
     .contact-image-section {
-      flex: 1; /* Equal width columns */
-      background-color: transparent; /* Reset background for this section on desktop */
-      padding: 0; /* Remove padding here */
+      flex: 1;
+      background-color: transparent;
+      padding: 0;
     }
 
     .contact-form-section {
-      flex: 1; /* Equal width columns */
-      padding: 60px; /* More padding on larger screens */
+      flex: 1;
+      padding: 60px;
     }
   }
 
   @media (max-width: 767px) {
     .contact-image-section {
-      padding: 30px 20px; /* More vertical padding for mobile, adjusted */
+      padding: 30px 20px;
     }
 
     .contact-form-section {
@@ -361,23 +365,59 @@
     }
 
     .form-group {
-        min-width: unset; /* Allow fields to shrink on small screens */
+        min-width: unset;
     }
 
     .form-row {
-      flex-direction: column; /* Stack fields vertically on mobile */
-      gap: 0; /* Remove gap when stacked */
+      flex-direction: column;
+      gap: 0;
     }
 
     .form-group {
-      margin-bottom: 15px; /* Add vertical spacing between stacked fields */
+      margin-bottom: 15px;
     }
 
     .submit-button {
-      width: 100%; /* Full width button on mobile */
+      width: 100%;
+
     }
   }
 </style>
+
+{% if form.posted_successfully? %}
+  <script>
+    // This script will redirect to a clean URL to prevent the success message from persisting on refresh.
+    // It also provides a visual fade-out for the message before the redirect.
+    document.addEventListener('DOMContentLoaded', function() {
+      const successMessage = document.querySelector('[data-form-success-message]');
+      const currentUrl = new URL(window.location.href);
+
+      // Check if the success parameter exists in the URL
+      if (currentUrl.searchParams.has('contact%5Bposted%5D')) {
+        // Optional: Fade out the message before redirecting for a smoother UX
+        if (successMessage) {
+          setTimeout(() => {
+            successMessage.style.opacity = '0';
+            // Set a slightly longer transition duration to ensure the fade is visible
+            successMessage.style.transition = 'opacity 1s ease-out';
+          }, 1000); // Start fading out after 1 second
+
+          // Wait for the fade-out to complete, then redirect
+          setTimeout(() => {
+            currentUrl.searchParams.delete('contact%5Bposted%5D');
+            // Use window.location.replace to prevent adding the old URL to history
+            // This means the back button won't go back to the URL with the success param
+            window.location.replace(currentUrl.toString());
+          }, 2000); // 1 second for fade-out + 1 second delay = 2 seconds total before redirect
+        } else {
+          // If message element isn't found (though it should be), just redirect immediately
+          currentUrl.searchParams.delete('contact%5Bposted%5D');
+          window.location.replace(currentUrl.toString());
+        }
+      }
+    });
+  </script>
+{% endif %}
 
 {% schema %}
 {
