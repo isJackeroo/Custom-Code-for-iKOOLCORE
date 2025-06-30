@@ -92,7 +92,7 @@
 
       {% if product.metafields.custom.spec %}
         <div class="tab-content {% if tab_rendered == 0 %}active{% endif %}" id="spec">
-          {{ product.metafields.custom.spec }}
+          {{ product.metafields.custom.spec | metafield_tag }}        
         </div>
         {% assign tab_rendered = tab_rendered | plus: 1 %}
       {% endif %}
