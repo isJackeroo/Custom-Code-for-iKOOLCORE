@@ -1,0 +1,182 @@
+<!-- 🌟 Ride 主题产品页 Tabs 区块 -->
+<style>
+  .custom-tabs {
+    font-family: Montserrat, Poppins, sans-serif;
+    font-size: 16px;
+    background-color: #EFF0F5;
+    border: 1px solid #e1e1e1;
+    border-radius: 8px;
+    overflow: hidden;
+    max-width: 75%;
+    margin: 0 auto;
+  }
+
+  .tab-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #e1e1e1;
+  }
+
+  .tab-buttons li {
+    flex: 1;
+    padding: 1rem;
+    list-style: none;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .tab-buttons li:hover {
+    background-color: #4770DB;
+    color: #fff;
+  }
+
+  .tab-buttons li.active {
+    background-color: #007BFF;
+    color: #fff;
+    font-weight: 500;
+    border-bottom: 2px solid #007aff;
+  }
+
+  .tab-content {
+    display: none;
+    padding: 1.5rem;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .tab-content.active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .tab-buttons svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+  }
+</style>
+
+{% assign tab_counter = 0 %}
+<section class="section page-width" style="margin-top: 3rem;">
+  {% if product.metafields.custom.spec or product.metafields.custom.reviews or product.metafields.custom.manual or product.metafields.custom.download %}
+    <div class="custom-tabs">
+      <ul class="tab-buttons">
+        {% if product.metafields.custom.spec %}
+          {% assign tab_counter = tab_counter | plus: 1 %}
+          <li class="active" data-tab="spec">Specifications</li>
+        {% endif %}
+        {% if product.metafields.custom.reviews %}
+          <li {% if tab_counter == 0 %}class="active"{% endif %} data-tab="reviews">Reviews</li>
+          {% assign tab_counter = tab_counter | plus: 1 %}
+        {% endif %}
+        {% if product.metafields.custom.manual %}
+          <li {% if tab_counter == 0 %}class="active"{% endif %} data-tab="manual">Manual</li>
+          {% assign tab_counter = tab_counter | plus: 1 %}
+        {% endif %}
+        {% if product.metafields.custom.download %}
+          <li {% if tab_counter == 0 %}class="active"{% endif %} data-tab="download">Downloads</li>
+        {% endif %}
+      </ul>
+
+      {% assign tab_rendered = 0 %}
+
+      {% if product.metafields.custom.spec %}
+        <div class="tab-content {% if tab_rendered == 0 %}active{% endif %}" id="spec">
+          {{ product.metafields.custom.spec }}
+        </div>
+        {% assign tab_rendered = tab_rendered | plus: 1 %}
+      {% endif %}
+
+      {% if product.metafields.custom.reviews %}
+        {% assign raw_reviews = product.metafields.custom.reviews | replace: '["', '' | replace: '"]', '' | split: '","' %}
+        <div class="tab-content {% if tab_rendered == 0 %}active{% endif %}" id="reviews">
+          {% for review_url in raw_reviews %}
+            {% assign video_id = review_url | split: 'v=' | last | split: '&' | first %}
+            {% if video_id %}
+              <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:6px;margin-bottom:1rem;">
+                <iframe src="https://www.youtube.com/embed/{{ video_id }}" frameborder="0" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
+              </div>
+            {% else %}
+              <p>⚠️ 无法识别视频链接：{{ review_url }}</p>
+            {% endif %}
+          {% endfor %}
+        </div>
+        {% assign tab_rendered = tab_rendered | plus: 1 %}
+      {% endif %}
+
+      {%- assign manual_data = product.metafields.custom.manual -%}
+      {% if manual_data %}
+        {% if manual_data contains '[' %}
+          {% assign manual_files = manual_data | parse_json %}
+        {% else %}
+          {% assign manual_files = manual_data | split: ',' %}
+        {% endif %}
+        <div class="tab-content {% if tab_rendered == 0 %}active{% endif %}" id="manual">
+          {% for file in manual_files %}
+            {% if file.url %}
+              <iframe src="{{ file.url }}#toolbar=1" width="100%" height="600px" style="border:none;margin-bottom:1rem;border-radius:6px;"></iframe>
+            {% elsif file contains 'http' %}
+              <iframe src="{{ file }}#toolbar=1" width="100%" height="600px" style="border:none;margin-bottom:1rem;border-radius:6px;"></iframe>
+            {% else %}
+              <p>⚠️ 无法识别手册文件：{{ file }}</p>
+            {% endif %}
+          {% endfor %}
+        </div>
+        {% assign tab_rendered = tab_rendered | plus: 1 %}
+      {% endif %}
+
+      {%- assign download_data = product.metafields.custom.download -%}
+      {% if download_data %}
+        {% if download_data contains '[' %}
+          {% assign download_files = download_data | parse_json %}
+        {% else %}
+          {% assign download_files = download_data | split: ',' %}
+        {% endif %}
+        <div class="tab-content {% if tab_rendered == 0 %}active{% endif %}" id="download">
+          <ul style="padding-left: 1rem;">
+            {% for file in download_files %}
+              <li style="margin-bottom: 0.8rem;">
+                {% if file.url %}
+                  📎 <a href="{{ file.url }}" target="_blank" download>{{ file.filename | default: '下载文件' }}</a>
+                {% elsif file contains 'http' %}
+                  📎 <a href="{{ file }}" target="_blank" download>下载链接</a>
+                {% else %}
+                  ⚠️ 文件格式无法识别：{{ file }}
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const tabs = document.querySelectorAll('.tab-buttons li');
+    const contents = document.querySelectorAll('.tab-content');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        contents.forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        const target = document.getElementById(tab.dataset.tab);
+        if (target) target.classList.add('active');
+      });
+    });
+  });
+</script>
+
+
+<!-- 🌟 Ride 主题产品页 Tabs 模块代码结束 -->
