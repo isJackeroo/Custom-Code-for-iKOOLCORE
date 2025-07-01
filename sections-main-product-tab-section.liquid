@@ -3,7 +3,7 @@
 
 <style>
   .custom-tabs {
-    font-family: Montserrat, Poppins, sans-serif;
+    font-family: Montserrat, Poppins;
     font-size: 14px;
     background-color: #EFF0F5;
     border: 1px solid #e1e1e1;
@@ -170,6 +170,9 @@
           <li class="{% if first_active %}active{% endif %}" data-tab="manual">Manual</li>
           {% assign first_active = false %}
         {% endif %}
+        {% if product.metafields.custom.accessories %}
+          <li class="{% if first_active %}active{% endif %}" data-tab="accessories">Accessories</li>
+        {% endif %}
         {% if product.metafields.custom.download %}
           <li class="{% if first_active %}active{% endif %}" data-tab="download">BIOS</li>
         {% endif %}
@@ -189,12 +192,10 @@
         <div class="tab-content {% if tab_rendered %}active{% endif %}" id="reviews">
           {% for review_url in raw_reviews %}
             {% assign video_id = review_url | split: 'v=' | last | split: '&' | first %}
-            {% if video_id %}
-              
+            {% if video_id %}       
             <div style="position:relative;padding-bottom:45%;height:0;overflow:hidden;border-radius:8px;margin:5rem auto;width:80%;">
               <iframe src="https://www.youtube.com/embed/{{ video_id }}" frameborder="0" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
-            </div>
-            
+            </div>            
             {% else %}
               <p>⚠️ 无法识别视频链接：{{ review_url }}</p>
             {% endif %}
@@ -207,7 +208,7 @@
         {% assign manual_url = product.metafields.custom.manual | remove: '[' | remove: ']' | remove: '"' %}
         <div class="tab-content {% if tab_rendered %}active{% endif %}" id="manual">
           <a href="{{ manual_url }}" target="_blank" rel="noopener" class="resource-link">
-            📖 View User Manual
+            📖 User Manual
           </a>
         </div>
         {% assign tab_rendered = false %}
@@ -218,7 +219,7 @@
         {% assign hardware_url = product.metafields.custom.hardware | remove: '[' | remove: ']' | remove: '"' %}
         <div class="tab-content {% if tab_rendered %}active{% endif %}" id="hardware">
           <a href="{{ hardware_url }}" target="_blank" rel="noopener" class="resource-link">
-            📃 View Hardware Overview
+            📃 Hardware Overview
           </a>
         </div>
         {% assign tab_rendered = false %}
@@ -232,6 +233,18 @@
           </a>
         </div>
       {% endif %}
+
+      {% if product.metafields.custom.accessories %}
+        {% assign tab_rendered = false %}
+        {% assign accessories_url = product.metafields.custom.accessories | remove: '[' | remove: ']' | remove: '"' %}
+        <div class="tab-content {% if tab_rendered %}active{% endif %}" id="accessories">
+          <a href="{{ accessories_url }}" target="_blank" rel="noopener" class="resource-link">
+            🔗 Accessories
+          </a>
+        </div>
+        {% assign tab_rendered = false %}
+      {% endif %}
+    
     </div>
   {% endif %}
 </section>
