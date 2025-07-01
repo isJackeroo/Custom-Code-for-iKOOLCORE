@@ -1,5 +1,6 @@
 <!-- 🌟 Ride 主题产品页 Tabs 区块 -->
 
+
 <style>
   .custom-tabs {
     font-family: Montserrat, Poppins, sans-serif;
@@ -17,6 +18,7 @@
     flex-wrap: wrap;
     background-color: #f9f9f9;
     border-bottom: 1px solid #e1e1e1;
+    padding: 0;
   }
 
   .tab-buttons li {
@@ -65,30 +67,8 @@
     height: 18px;
     fill: currentColor;
   }
-  .user-manual-link{
-    display: inline-block;
-    padding: 10px 12px;
-    background-color: #4770DB;
-    color: #ffffff;
-    font-weight: 400;
-    border-radius: 3px;
-    text-decoration: none;
-    font-size: 14px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    margin-top: 18px;
-    margin-bottom: 18px;
-    margin-left: 18px;
-    
-  }
 
-  .user-manual-link:hover{
-    background-color: #007be5;
-    transform: translateY(-2px);
-    text-decoration: none;
-  }
-
-.user-download-link {
+.resource-link {
   display: inline-block;
   padding: 10px 12px;
   background-color: #4770DB;
@@ -104,7 +84,7 @@
   margin-left: 18px;
 }
 
-.user-download-link:hover {
+.resource-link:hover {
   background-color: #007be5;
   transform: translateY(-2px);
   text-decoration: none;
@@ -119,23 +99,29 @@
     border-left: none;
     border-right: none;
     width: 100%;
-    padding-left: 2px;
-    padding-right: 2px;
+    padding-left: 0;
+    padding-right: 0;
+    width: 100vw;               /* 让内容横跨整个视口宽度 */
+    box-sizing: border-box;     /* 避免 padding 导致溢出 */
 
   }
 
   .tab-buttons li {
     padding: 0.3rem;
-    font-size: 14px;
+    font-size: 13px;
     gap: 2px;
   }
 
-  .user-manual-link,
-  .user-download-link {
-    font-size: 13px;
+  .resource-link{
+    font-size: 1.3rem;
     padding: 8px 10px;
     margin-left: 10px;
     margin-right: 10px;
+  }
+
+  .tab-content {
+    padding: 0;
+
   }
   .tab-buttons li {
     min-height: 48px; /* 推荐的触摸区域高度 */
@@ -146,10 +132,19 @@
   .tab-buttons {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-}
+  }
+  .tab-content p {
+    line-height: 1.7;
+    letter-spacing: 0.3px;
+    color: #333;
+  }
+  .tab-content li ul {
+    line-height: 1.7;
+    letter-spacing: 0.3px;
+    color: #333;
+  }
 
 }
-
   
 </style>
 
@@ -161,19 +156,22 @@
       <!-- Tab Buttons -->
       <ul class="tab-buttons">
         {% if product.metafields.custom.spec %}
-          <li class="{% if first_active %}active{% endif %}" data-tab="spec">Specifications</li>
+          <li class="{% if first_active %}active{% endif %}" data-tab="spec">Spec</li>
           {% assign first_active = false %}
-        {% endif %}
+        {% endif %}    
         {% if product.metafields.custom.reviews %}
           <li class="{% if first_active %}active{% endif %}" data-tab="reviews">Reviews</li>
           {% assign first_active = false %}
+        {% endif %}
+        {% if product.metafields.custom.hardware %}
+          <li class="{% if first_active %}active{% endif %}" data-tab="hardware">Params</li>
         {% endif %}
         {% if product.metafields.custom.manual %}
           <li class="{% if first_active %}active{% endif %}" data-tab="manual">Manual</li>
           {% assign first_active = false %}
         {% endif %}
         {% if product.metafields.custom.download %}
-          <li class="{% if first_active %}active{% endif %}" data-tab="download">Downloads</li>
+          <li class="{% if first_active %}active{% endif %}" data-tab="download">BIOS</li>
         {% endif %}
       </ul>
 
@@ -192,9 +190,11 @@
           {% for review_url in raw_reviews %}
             {% assign video_id = review_url | split: 'v=' | last | split: '&' | first %}
             {% if video_id %}
-              <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:6px;margin-bottom:1rem;">
-                <iframe src="https://www.youtube.com/embed/{{ video_id }}" frameborder="0" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
-              </div>
+              
+            <div style="position:relative;padding-bottom:45%;height:0;overflow:hidden;border-radius:8px;margin:5rem auto;width:80%;">
+              <iframe src="https://www.youtube.com/embed/{{ video_id }}" frameborder="0" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
+            </div>
+            
             {% else %}
               <p>⚠️ 无法识别视频链接：{{ review_url }}</p>
             {% endif %}
@@ -206,8 +206,19 @@
       {% if product.metafields.custom.manual %}
         {% assign manual_url = product.metafields.custom.manual | remove: '[' | remove: ']' | remove: '"' %}
         <div class="tab-content {% if tab_rendered %}active{% endif %}" id="manual">
-          <a href="{{ manual_url }}" target="_blank" rel="noopener" class="user-manual-link">
-            📘 View User Manual
+          <a href="{{ manual_url }}" target="_blank" rel="noopener" class="resource-link">
+            📖 View User Manual
+          </a>
+        </div>
+        {% assign tab_rendered = false %}
+      {% endif %}
+    
+      {% if product.metafields.custom.hardware %}
+        {% assign tab_rendered = false %}
+        {% assign hardware_url = product.metafields.custom.hardware | remove: '[' | remove: ']' | remove: '"' %}
+        <div class="tab-content {% if tab_rendered %}active{% endif %}" id="hardware">
+          <a href="{{ hardware_url }}" target="_blank" rel="noopener" class="resource-link">
+            📃 View Hardware Overview
           </a>
         </div>
         {% assign tab_rendered = false %}
@@ -216,7 +227,7 @@
       {% if product.metafields.custom.download %}
         {% assign download_url = product.metafields.custom.download | remove: '[' | remove: ']' | remove: '"' %}
         <div class="tab-content {% if tab_rendered %}active{% endif %}" id="download">
-          <a href="{{ download_url }}" target="_blank" rel="noopener" class="user-download-link">
+          <a href="{{ download_url }}" target="_blank" rel="noopener" class="resource-link">
             💾 Download BIOS
           </a>
         </div>
