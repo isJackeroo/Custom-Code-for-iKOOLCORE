@@ -1,4 +1,6 @@
+                          
 <!-- 🌟 Ride 主题产品页 Tabs 区块 -->
+<!-- 增强代码逻辑，支持多个tab传输多个url -->
 
 
 <style>
@@ -205,51 +207,64 @@
       {% endif %}
 
       {% if product.metafields.custom.manual %}
-        {% assign manual_url = product.metafields.custom.manual | remove: '[' | remove: ']' | remove: '"' %}
+        {% assign manual_urls = product.metafields.custom.manual | replace: '["', '' | replace: '"]', '' | split: '","' %}
         <div class="tab-content {% if tab_rendered %}active{% endif %}" id="manual">
-          <a href="{{ manual_url }}" target="_blank" rel="noopener" class="resource-link">
-            📖 User Manual
-          </a>
+          {% for manual_url in manual_urls %}
+            <p>
+              <a href="{{ manual_url }}" target="_blank" rel="noopener" class="resource-link">
+                📖 User Manual - {{ forloop.index }}
+              </a>
+            </p>
+          {% endfor %}
         </div>
         {% assign tab_rendered = false %}
       {% endif %}
-    
+      
       {% if product.metafields.custom.hardware %}
-        {% assign tab_rendered = false %}
-        {% assign hardware_url = product.metafields.custom.hardware | remove: '[' | remove: ']' | remove: '"' %}
+        {% assign hardware_urls = product.metafields.custom.hardware | replace: '["', '' | replace: '"]', '' | split: '","' %}
         <div class="tab-content {% if tab_rendered %}active{% endif %}" id="hardware">
-          <a href="{{ hardware_url }}" target="_blank" rel="noopener" class="resource-link">
-            📃 Hardware Overview
-          </a>
+          {% for hardware_url in hardware_urls %}
+            <p>
+              <a href="{{ hardware_url }}" target="_blank" rel="noopener" class="resource-link">
+                📃 Hardware Overview - {{ forloop.index }}
+              </a>
+            </p>
+          {% endfor %}
         </div>
         {% assign tab_rendered = false %}
-      {% endif %}
+      {% endif %}  
 
       {% if product.metafields.custom.download %}
-        {% assign download_url = product.metafields.custom.download | remove: '[' | remove: ']' | remove: '"' %}
+        {% assign download_urls = product.metafields.custom.download | replace: '["', '' | replace: '"]', '' | split: '","' %}
         <div class="tab-content {% if tab_rendered %}active{% endif %}" id="download">
-          <a href="{{ download_url }}" target="_blank" rel="noopener" class="resource-link">
-            💾 Download BIOS
-          </a>
+          {% for download_url in download_urls %}
+            <p>
+              <a href="{{ download_url }}" target="_blank" rel="noopener" class="resource-link">
+                💾 Download BIOS - {{ forloop.index }}
+              </a>
+            </p>
+          {% endfor %}
         </div>
+        {% assign tab_rendered = false %}
       {% endif %}
 
       {% if product.metafields.custom.accessories %}
-        {% assign tab_rendered = false %}
-        {% assign accessories_url = product.metafields.custom.accessories | remove: '[' | remove: ']' | remove: '"' %}
+        {% assign accessories_urls = product.metafields.custom.accessories | replace: '["', '' | replace: '"]', '' | split: '","' %}
         <div class="tab-content {% if tab_rendered %}active{% endif %}" id="accessories">
-          <a href="{{ accessories_url }}" target="_blank" rel="noopener" class="resource-link">
-            🔗 Accessories
-          </a>
+          {% for accessories_url in accessories_urls %}
+            <p>
+              <a href="{{ accessories_url }}" target="_blank" rel="noopener" class="resource-link">
+                🔗 Accessories - {{ forloop.index }}
+              </a>
+            </p>
+          {% endfor %}
         </div>
         {% assign tab_rendered = false %}
       {% endif %}
-    
+  
     </div>
   {% endif %}
 </section>
-
-
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
