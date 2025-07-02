@@ -1,0 +1,118 @@
+<style>
+{% comment %}
+  Coupon display block
+  Author: Copilot for Jackeroo
+  Usage: {% render 'coupon-block' %}
+{% endcomment %}
+
+.product-coupon-card {
+  border-radius: 10px;
+  padding: 16px;
+  margin: 16px 0;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+.product-coupon-card:hover {
+  transform: scale(1.02);
+}
+
+.product-coupon-card.full {
+  background: linear-gradient(135deg, #e6f9e6, #ccffcc);
+  border: 2px dashed #27ae60;
+}
+.product-coupon-card.free {
+  background: linear-gradient(135deg, #e6f2ff, #cce0ff);
+  border: 2px dashed #2980b9;
+}
+.product-coupon-card.percent {
+  background: linear-gradient(135deg, #fff2cc, #ffe6cc);
+  border: 2px dashed #f39c12;
+}
+
+.coupon-header {
+  font-size: 1em;
+  font-weight: bold;
+  margin: 2px 0;
+}
+
+.coupon-code-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  margin: 2px 0;
+  padding-bottom: 2px;
+}
+
+.coupon-code {
+  font-size: 1em;
+  padding: 8px 12px;
+  background: #fff;
+  border-radius: 6px;
+  border: 1px dashed #aaa;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.coupon-code:hover {
+  background: #fdf2d2;
+  color: #d35400;
+
+}
+
+.copy-btn {
+  background: #007BFF;
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  font-size: 1em;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.copy-btn:hover {
+  background: #e67e22;
+}
+.coupon-footer{
+  font-size:0.88em;
+  font-weight:500;
+}
+  
+</style>
+
+{% if product.metafields.custom.coupon %}
+    <div class="coupon-header">Limited-time Offer:</div>
+    <div class="coupon-code-box">
+      <span class="coupon-code" id="couponCode">{{ product.metafields.custom.coupon }}</span>
+      <button class="copy-btn" onclick="copyCouponCode(this)">Copy</button>
+    </div>
+    <div class="coupon-footer">Enter it at checkout for a discount.</div>
+  </div>
+{% endif %}    
+
+
+<script>
+  function copyCouponCode(btn) {
+    const code = document.getElementById("couponCode").innerText;
+
+    navigator.clipboard.writeText(code).then(() => {
+      btn.innerText = "Copied";
+      btn.disabled = true;
+      btn.style.background = "#28a745"; // 成功绿色
+
+      // 恢复原样
+      setTimeout(() => {
+        btn.innerText = "Copy";
+        btn.disabled = false;
+        btn.style.background = "#007BFF";
+      }, 2000);
+    }).catch(() => {
+      btn.innerText = "Failed";
+      btn.style.background = "#dc3545"; // 失败红色
+      setTimeout(() => {
+        btn.innerText = "Copy";
+        btn.style.background = "#007BFF";
+      }, 2000);
+    });
+  }
+</script>
