@@ -1,18 +1,13 @@
 <style>
-{% comment %}
-  Coupon display block
-  Author: Copilot for Jackeroo
-  Usage: {% render 'coupon-block' %}
-{% endcomment %}
-
 .product-coupon-card {
   border-radius: 10px;
   padding: 16px;
   margin: 16px 0;
   text-align: center;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  transition: transform 0.2s;
+  transition: transform 0.2s ease-in-out;
 }
+
 .product-coupon-card:hover {
   transform: scale(1.02);
 }
@@ -30,65 +25,79 @@
   border: 2px dashed #f39c12;
 }
 
-.coupon-header {
-  font-size: 1em;
-  font-weight: bold;
-  margin: 2px 0;
+/* --- Flexbox容器:用于对齐所有元素的  --- */
+.coupon-container {
+  display: flex;
+  justify-content: left; /* 水平居中 */
+  align-items: center; /* 垂直居中 - 核心改动 */
+  gap: 8px;    /* 元素之间的间距 */
+  flex-wrap: wrap;  /* 在小屏幕上换行，提高响应性 */
+  margin: 4px 0;
 }
 
-.coupon-code-box {
+
+/* 通用按钮/标签样式统一对齐属性 */
+.coupon-label,
+.coupon-code,
+.copy-btn {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
   justify-content: center;
-  margin: 2px 0;
-  padding-bottom: 2px;
+  font-size: 1em;
+  font-weight: 600;
+  line-height: 1;
+  padding: 10px 16px;
+  border-radius: 6px;
+  box-sizing: border-box;
+  transition: all 0.2s ease-in-out;
 }
 
+/* Coupon label 样式 */
+.coupon-label {
+  color: #b35500;
+  background: #fff8e1;
+  border: 1px dashed #f0b429;
+  box-shadow: 0 1px 3px rgba(243, 156, 18, 0.15);
+}
+
+/* Coupon code 样式 */
 .coupon-code {
-  font-size: 1em;
-  padding: 8px 12px;
   background: #fff;
-  border-radius: 6px;
   border: 1px dashed #aaa;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
 }
 .coupon-code:hover {
   background: #fdf2d2;
   color: #d35400;
-
 }
 
+/* 复制按钮样式 */
 .copy-btn {
   background: #007BFF;
+  color: #fff;
   border: none;
-  color: white;
-  padding: 8px 12px;
-  font-size: 1em;
-  border-radius: 6px;
   cursor: pointer;
-  transition: background 0.2s;
 }
 .copy-btn:hover {
   background: #e67e22;
 }
-.coupon-footer{
-  font-size:0.88em;
-  font-weight:500;
-}
-  
 </style>
 
+
 {% if product.metafields.custom.coupon %}
-    <div class="coupon-header">Limited-time Offer:</div>
-    <div class="coupon-code-box">
-      <span class="coupon-code" id="couponCode">{{ product.metafields.custom.coupon }}</span>
-      <button class="copy-btn" onclick="copyCouponCode(this)">Copy</button>
-    </div>
-    <div class="coupon-footer">Enter it at checkout for a discount.</div>
+  <div class="coupon-container">
+    <span class="coupon-label">
+      <svg class="label-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="#e67e22" viewBox="0 0 16 16">
+        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.32-.158-.888.283-.95l4.898-.696 2.19-4.447c.197-.399.73-.399.927 0l2.19 4.447 4.898.696c.441.062.612.63.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+      </svg>
+      <span class="label-text">Special Offer</span>
+    </span>
+
+    <span class="coupon-code" id="couponCode">{{ product.metafields.custom.coupon }}</span>
+    
+    <button class="copy-btn" onclick="copyCouponCode(this)">Copy</button>
   </div>
-{% endif %}    
+{% endif %} 
 
 
 <script>
