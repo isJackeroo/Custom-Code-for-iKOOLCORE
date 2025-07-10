@@ -15,6 +15,7 @@
   {{ 'component-slider.css' | asset_url | stylesheet_tag }}
   {{ 'component-rating.css' | asset_url | stylesheet_tag }}
   {{ 'component-deferred-media.css' | asset_url | stylesheet_tag }}
+  {{ 'component-custom-tags.css' | asset_url | stylesheet_tag }}
 
   {% unless product.has_only_default_variant %}
     {{ 'component-product-variant-picker.css' | asset_url | stylesheet_tag }}
@@ -71,7 +72,7 @@
       onload="this.media='all'"
     >
   {%- endif -%}
-
+  
   {% assign variant_images = product.images | where: 'attached_to_variant?', true | map: 'src' %}
   <div class="page-width">
     <div class="product product--{{ section.settings.media_size }} product--{{ section.settings.media_position }} product--{{ section.settings.gallery_layout }} product--mobile-{{ section.settings.mobile_thumbnails }} grid grid--1-col {% if product.media.size > 0 %}grid--2-col-tablet{% else %}product--no-media{% endif %}">
@@ -87,15 +88,209 @@
 
           {%- for block in section.blocks -%}
             {%- case block.type -%}
+
+          
+              {% if product.metafields.custom.tag != blank %}
+                <div class="product-tags-container">
+                  <h3 class="tags-title">Tags:</h3>
+                  <div class="tags-list">
+                    {{ product.metafields.custom.tag | metafield_tag }}
+                  </div>
+                </div>
+              {% endif %} 
+<style>
+/* 外层标签容器，横向排列标题和标签列表 */
+.product-tags-container {
+  display: flex;                        /* 横向排列子元素 */
+  align-items: baseline;               /* 与标题文字底部对齐 */
+  gap: 16px;                            /* 标题与标签组之间的间距 */
+  margin: 0;                            /* 上下左右外边距 */
+  font-family: inherit;                /* 继承整体字体 */
+}
+
+/* 标签标题样式，例如 “Tags:” */
+.tags-title {
+  margin: 0;                            /* 取消默认 margin */
+  font-size: 1rem;                     /* 标题文字大小 */
+  font-weight: 500;                    /* 中等粗细 */
+  color: rgb(var(--color-base-text));  /* 使用主题文本色 */
+  flex-shrink: 0;                      /* 避免被挤压 */
+}
+
+/* 标签列表容器（ul），横向换行排列每个标签（li） */
+.tags-list ul {
+  list-style: none;                    /* 去掉默认列表样式 */
+  padding: 0;                          /* 去除内边距 */
+  margin: 0;                           /* 去除外边距 */
+  display: flex;                       /* 横向排列 li */
+  flex-wrap: wrap;                     /* 超出容器则换行 */
+  gap: 10px 12px;                      /* 行间距10px，列间距12px */
+}
+
+/* 每个标签项的样式 */
+.tags-list li {
+  display: inline-flex;                /* 让文字垂直居中 */
+  align-items: center;                 /* 垂直方向居中对齐 */
+  padding: 4px 5px;                    /* 控制点击区域和留白 */
+  font-size: 0.9rem;                   /* 字体大小 */
+  font-weight: 400;                    /* 字体粗细 */
+  line-height: 1.4;                    /* 行高，辅助垂直对齐 */
+  white-space: nowrap;                /* 不换行，保持标签一行显示 */
+  border: 1px solid rgba(var(--color-foreground), 0.15); /* 淡色边框 */
+  border-radius: 4px;                  /* 圆角边框 */
+  transition:                          /* 动效过渡定义 */
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+/* 标签悬停样式，增强交互反馈 */
+.tags-list li:hover {
+  cursor: default;                     /* 鼠标样式（可改成 pointer） */
+  transform: translateY(-3px);         /* 上移 3px 形成浮起效果 */
+  box-shadow: 0 4px 12px rgba(var(--color-shadow), 0.12); /* 阴影效果 */
+  border-color: rgb(var(--color-button));                 /* 加重边框色 */
+  background-color: rgb(var(--color-background));         /* 背景变亮 */
+}
+</style>
+          
+            {%- when 'coupon' -%}
+              {%- if product.metafields.custom.coupon != blank -%}
+        
+              <div class="product-coupon-block" {{ block.shopify_attributes }}>
+                <div class="coupon-container">
+                  <span class="coupon-label">
+                    <svg class="label-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="#e67e22" viewBox="0 0 16 16">
+                      <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.32-.158-.888.283-.95l4.898-.696 2.19-4.447c.197-.399.73-.399.927 0l2.19 4.447 4.898.696c.441.062.612.63.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                    </svg>
+                    <span class="label-text">{{ block.settings.heading | escape }}</span>
+                  </span>
+          
+                  <span class="coupon-code" id="couponCode-{{ section.id }}">{{ product.metafields.custom.coupon.value }}</span>
+                  
+                  <button class="copy-btn" onclick="copyCouponCode(this, 'couponCode-{{ section.id }}')">Copy</button>
+                </div>
+              </div>
+<style>
+.coupon-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.coupon-label,
+.coupon-code,
+.copy-btn {
+  font-size: 1.3rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  line-height: 1;
+  border-radius: 6px;
+  box-sizing: border-box;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid;
+}
+
+.coupon-label {
+  color: #b35500;
+  background: #fff8e1;
+  border-color: #f0b429;
+  border-style: dashed;
+}
+
+.coupon-label .label-icon {
+  margin-right: 6px;
+}
+
+.coupon-code {
+  color: #333;
+  background: #fff;
+  border-color: #aaa;
+  border-style: dashed;
+  cursor: pointer;
+}
+
+.coupon-code:hover {
+  background: #fff8e1;
+  color: #d35400;
+  border-color: #f0b429;
+  border-style: dashed;
+}
+
+.copy-btn {
+  color: #fff;
+  background: #007BFF;
+  border-color: #007BFF;
+  cursor: pointer;
+}
+
+.copy-btn:hover {
+  background: #e67e22;
+  border-color: #e67e22;
+}
+
+.copy-btn.copied {
+  background: #28a745;
+  border-color: #28a745;
+}
+
+.copy-btn.failed {
+  background: #dc3545;
+  border-color: #dc3545;
+}
+
+</style>          
+              <script>
+                if (typeof copyCouponCode !== 'function') {
+                  function copyCouponCode(btn, elementId) {
+                    const codeElement = document.getElementById(elementId);
+                    if (!codeElement) return;
+          
+                    const code = codeElement.innerText;
+                    const originalText = btn.innerText;
+                    const originalBackground = btn.style.background;
+          
+                    navigator.clipboard.writeText(code).then(() => {
+                      btn.innerText = "Copied";
+                      btn.disabled = true;
+                      btn.classList.add('copied');
+          
+                      setTimeout(() => {
+                        btn.innerText = originalText;
+                        btn.disabled = false;
+                        btn.classList.remove('copied');
+                        btn.style.background = originalBackground;
+                      }, 2000);
+                    }).catch(() => {
+                      btn.innerText = "Failed";
+                      btn.classList.add('failed');
+                      setTimeout(() => {
+                        btn.innerText = originalText;
+                        btn.classList.remove('failed');
+                        btn.style.background = originalBackground;
+                      }, 2000);
+                    });
+                  }
+                }
+              </script>
+
+                        
+            {%- endif -%}
+              
               {%- when '@app' -%}
                 {% render block %}
+              
               {% when 'product_page_coupon' %} 
-                {% render 'product-page-coupon-content', block: block %}
+                {% render 'product-page-coupon-content', block: block %}          
               {%- when 'text' -%}
-                <p
-                  class="product__text inline-richtext{% if block.settings.text_style == 'uppercase' %} caption-with-letter-spacing{% elsif block.settings.text_style == 'subtitle' %} subtitle{% endif %}"
-                  {{ block.shopify_attributes }}
-                >
+                <p class="product__text inline-richtext{% if block.settings.text_style == 'uppercase' %} caption-with-letter-spacing{% elsif block.settings.text_style == 'subtitle' %} subtitle{% endif %}"
+                  {{ block.shopify_attributes }}>
                   {{- block.settings.text -}}
                 </p>
               {%- when 'title' -%}
@@ -107,7 +302,8 @@
                     </h2>
                   </a>
                 </div>
-           
+
+              
               {%- when 'custom_whatsapp_button' -%}
                 <a href="https://wa.me/{{ block.settings.whatsapp_number }}?text=Hi%2C%20I'm%20interested%20in%20the%20{{ product.title | url_encode }}%20on%20your%20store%20({{ shop.url }}{{ product.url }})"
                    target="_blank"
@@ -140,6 +336,7 @@
                   {%- endcase -%}
                   {{ block.settings.button_text }}
                 </a>
+
               
               {%- when 'price' -%}
                 <div id="price-{{ section.id }}" role="status" {{ block.shopify_attributes }}>
@@ -177,6 +374,7 @@
                     {{ form | payment_terms }}
                   {%- endform -%}
                 </div>
+         
               {%- when 'inventory' -%}
                 <p
                   class="product__inventory{% if block.settings.text_style == 'uppercase' %} caption-with-letter-spacing{% elsif block.settings.text_style == 'subtitle' %} subtitle{% endif %}{% if product.selected_or_first_available_variant.inventory_management != 'shopify' %} visibility-hidden{% endif %}"
@@ -228,13 +426,15 @@
                     {%- endif -%}
                   {%- endif -%}
                 </p>
-          
-                   {%- when 'description' -%}
-                    {%- if product.description != blank -%}
-                      <div class="product__description rte quick-add-hidden" {{ block.shopify_attributes }}>
-                        {{ product.description }}
-                      </div>                     
-                    {%- endif -%}
+
+              
+              {%- when 'description' -%}
+                {%- if product.description != blank -%}
+                  <div class="product__description rte quick-add-hidden" {{ block.shopify_attributes }}>
+                    {{ product.description }}
+                  </div>                     
+              {%- endif -%}
+                                        
               {%- when 'sku' -%}
                 <p
                   class="product__sku{% if block.settings.text_style == 'uppercase' %} caption-with-letter-spacing{% elsif block.settings.text_style == 'subtitle' %} subtitle{% endif %}{% if product.selected_or_first_available_variant.sku.size == 0 %} visibility-hidden{% endif %}"
@@ -433,6 +633,7 @@
                         -}}
                       </span>
                     {%- endif -%}
+              
                   </div>
                   {%- if product.quantity_price_breaks_configured? -%}
                     <volume-pricing class="parent-display" id="Volume-{{ section.id }}">
@@ -476,54 +677,77 @@
                         {%- endif -%}
                       {%- endif -%}
                     </volume-pricing>
-                  {%- endif -%}
+                  {%- endif -%}            
                 </div>
-
+                      
               {% if product.metafields.custom.selling_point != blank %}
                 <div class="product-selling-points">
-                    <h3>Highlights:</h3>
+                  <h3>Highlights:</h3>
                     {{ product.metafields.custom.selling_point | metafield_tag }}
                     </div>
               {% endif %} 
 
-              
-              <style>
-                .product-selling-points {
-                  margin-top: -10px;
-                  border-top: 1px solid #eee;
-                }
-                .product-selling-points h3 {
-                  font-size: 0.95em;
-                  margin-bottom: 12px;
-                  line-height: 1.2;
-                }
-              
-                /* 针对无序列表的优化 */
-                .product-selling-points ul {
-                  list-style: disc; /* 使用实心圆点 */
-                  padding-left: 20px; /* 整个列表左侧内边距，为列表点留出空间 */
-                  margin: 0; /* 移除默认的 ul 上下外边距 */
-                  font-size: 1em;
-                }
-              
-                .product-selling-points ul li {
-                  margin-bottom: 8px; /* 每个列表项下方留出更多空间，增强可读性 */
-                  line-height: 1.3; /* 增加行高，让长文本换行后更易读 */
-                  list-style-position: outside; /* 关键：确保列表点在内容区域的外部，这样换行文字会和第一行对齐 */
-                  padding-left: 0; /* 移除 li 默认的 padding-left，因为我们通过 ul 来控制缩进 */
-                  font-size: 0.9em;
-                }
-              
-                /* 如果仍有P标签，也保持一致的行高和底部间距 */
-                .product-selling-points p {
-                  margin-bottom: 8px;
-                  line-height: 1.6;
-                  font-size: 0.8em;
+              {% if product.metafields.custom.tag != blank %}
+                <div class="product-tags-container">
+                  <h3 class="tags-title">Tags:</h3>
+                  <div class="tags-list">
+                    {{ product.metafields.custom.tag | metafield_tag }}
+                  </div>
+                </div>
+              {% endif %} 
 
+              <style>
+              .product-tags-container {
+                  display: flex;
+                  align-items: baseline;
+                  gap: 16px;
+                  margin: 24px 0;
+                  font-family: inherit;
                 }
+              
+                .tags-title {
+                  margin: 0;
+                  font-size: 1rem;
+                  font-weight: 500;
+                  color: rgb(var(--color-base-text));
+                  flex-shrink: 0;
+                }
+                
+                .tags-list ul {
+                  list-style: none;
+                  padding: 0;
+                  margin: 0;
+                  display: flex;
+                  flex-wrap: wrap;
+                  gap: 10px 12px; /* Vertical and horizontal gap */
+                }
+              
+                .tags-list li {
+                  display: inline-flex;
+                  align-items: center;
+                  padding: 4px 5px;
+                  font-size: 0.9rem;
+                  font-weight: 400; /* Slightly bolder for clarity */
+                  line-height: 1.4;
+                  white-space: nowrap;
+                  color: rgb(var(--color-base-text));
+                  background-color: rgb(var(--color-background-secondary)); /* Use a secondary background color from the theme */
+                  border: 1px solid rgba(var(--color-foreground), 0.15);
+                  border-radius: 4px; /* Slightly more pronounced radius */
+                  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+                }
+              
+                .tags-list li:hover {
+                  cursor: default;
+                  transform: translateY(-3px);
+                  box-shadow: 0 4px 12px rgba(var(--color-shadow), 0.12);
+                  border-color: rgb(var(--color-button));
+                  background-color: rgb(var(--color-background));
+                }
+                            
               </style>
 
-              
+                                                
               {%- when 'popup' -%}
                 <modal-opener
                   class="product-popup-modal__opener quick-add-hidden"
@@ -593,6 +817,7 @@
                     </p>
                   </div>
                 {%- endif -%}
+                 
               {%- when 'complementary' -%}
                 <product-recommendations
                   class="complementary-products quick-add-hidden{% if block.settings.make_collapsible_row %} is-accordion{% endif %}{% if block.settings.enable_quick_add %} complementary-products-contains-quick-add{% endif %}"
@@ -680,6 +905,7 @@
                               </div>
                             {%- endfor -%}
                           </div>
+
                           {%- if number_of_slides > 1 -%}
                             <div class="slider-buttons">
                               <button
@@ -750,7 +976,7 @@
             {{ 'products.product.view_full_details' | t }}
             {{- 'icon-arrow.svg' | inline_asset_content -}}
           </a>
-        </section>
+        </section>                         
       </div>
     </div>
 
@@ -801,163 +1027,17 @@
         assign seo_media = product.featured_media
       endif -%}
 
-
     <script type="application/ld+json">
       {{ product | structured_data }}
     </script>
 
+
+
+
                           
 <!-- 🌟 Ride 主题产品页 Tabs 区块 -->
-
-<style>
-  .custom-tabs {
-    font-family: Montserrat, Poppins;
-    background-color: #EFF0F5;
-    border: 1px solid #e1e1e1;
-    border-radius: 8px;
-    overflow: hidden;
-    font-size: 1em;
-    margin: 0 auto;
-  }
-
-  .tab-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    background-color: #f9f9f9;
-    border-bottom: 1px solid #e1e1e1;
-    padding: 0;
-  }
-
-  .tab-buttons li {
-    flex: 1;
-    padding: 2px 6px;
-    list-style: none;
-    text-align: center;
-    cursor: pointer;
-    transition: background 0.3s ease;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-
-  .tab-buttons li:hover {
-    background-color: #4770DB;
-    color: #fff;
-  }
-
-  .tab-buttons li.active {
-    background-color: #007BFF;
-    color: #fff;
-    font-weight: 500;
-    border-bottom: 2px solid #007aff;
-  }
-
-  .tab-content {
-    display: none;
-    padding: 1.5rem;
-    animation: fadeIn 0.4s ease;
-  }
-
-  .tab-content.active {
-    display: block;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .tab-buttons svg {
-    width: 18px;
-    height: 18px;
-    fill: currentColor;
-  }
-
-.resource-link {
-  display: inline-block;
-  padding: 2px 6px;
-  background-color: #4770DB;
-  color: #ffffff;
-  font-weight: 400;
-  border-radius: 3px;
-  text-decoration: none;
-  font-size: 14px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  margin-top: 18px;
-  margin-bottom: 18px;
-  margin-left: 18px;
-}
-
-.resource-link:hover {
-  background-color: #007be5;
-  transform: translateY(-2px);
-  text-decoration: none;
-}
-
-
-@media (max-width: 768px) {
-  .custom-tabs {
-    max-width: 100%;
-    font-size: 0.8em;
-    border-radius: 0;
-    border-left: none;
-    border-right: none;
-    width: 100%;
-    padding-left: 0;
-    padding-right: 0;
-    width: 100vw;               /* 让内容横跨整个视口宽度 */
-    box-sizing: border-box;     /* 避免 padding 导致溢出 */
-
-  }
-
-  .tab-buttons li {
-    padding: 0.3rem;
-    font-size: 0.95em;
-    gap: 2px;
-  }
-
-  .resource-link{
-    font-size: 1rem;
-    padding: 8px 10px;
-    margin-left: 10px;
-    margin-right: 10px;
-  }
-
-  .tab-content {
-    padding: 0;
-
-  }
-  .tab-buttons li {
-    min-height: 1em; /* 推荐的触摸区域高度 */
-  }
-  .tab-buttons li:active {
-    background-color: #005ec2;
-  }
-  .tab-buttons {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .tab-content p {
-    line-height: 1.7;
-    letter-spacing: 0.3px;
-    color: #333;
-  }
-  .tab-content li ul {
-    line-height: 1.7;
-    letter-spacing: 0.3px;
-    color: #333;
-  }
-
-}
-  
-</style>
-
-
 {% assign first_active = true %}
-<section class="section page-width" style="margin-top: 3rem;">
+<section class="section page-width">
   {% if product.metafields.custom.spec or product.metafields.custom.reviews or product.metafields.custom.manual or product.metafields.custom.download %}
     <div class="custom-tabs">
       <!-- Tab Buttons -->
@@ -999,12 +1079,13 @@
         <div class="tab-content {% if tab_rendered %}active{% endif %}" id="reviews">
           {% for review_url in raw_reviews %}
             {% assign video_id = review_url | split: 'v=' | last | split: '&' | first %}
-            {% if video_id %}       
-            <div style="position:relative;padding-bottom:45%;height:0;overflow:hidden;border-radius:8px;margin:5rem auto;width:80%;">
-              <iframe src="https://www.youtube.com/embed/{{ video_id }}" frameborder="0" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
-            </div>            
+            {% if video_id %}     
+              <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/{{ video_id }}" frameborder="0" allowfullscreen class="video-iframe"></iframe>
+              </div>   
+      
             {% else %}
-              <p>⚠️ 无法识别视频链接：{{ review_url }}</p>
+              <p>⚠️ Video Not Found：{{ review_url }}</p>
             {% endif %}
           {% endfor %}
         </div>
@@ -1086,23 +1167,36 @@
     });
   });
 </script>
-
 <!-- 🌟 Ride 主题产品页 Tabs 模块代码结束 -->
-
-
-
-
-                       
-  </div>                        
+                          
+  </div>
 </product-info>
 
+
+                     
+                          
 {% schema %}
 {
   "name": "t:sections.main-product.name",
   "tag": "section",
   "class": "section",
   "blocks": [
-     {
+   
+    {
+      "type": "coupon",
+      "name": "Coupon",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "default": "Special Offer",
+          "label": "Heading"
+        }
+      ]
+    },
+
+    {
       "type": "product_page_coupon",
       "name": "Product Page Coupon",     // 在主题编辑器中显示的名称
       "limit": 1,                   // 可选：限制每个产品页面只能添加一个此类型的 Block。如果希望允许多个，请删除此行。
@@ -1170,10 +1264,6 @@
     {
       "type": "@app"
     },
-
-    
-    
-    
     {
       "type": "custom_whatsapp_button",
       "name": "WhatsApp Button",
